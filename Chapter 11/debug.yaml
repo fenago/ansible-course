@@ -1,0 +1,7 @@
+---
+- hosts: localhost
+  tasks:
+    - shell: /usr/bin/uptime
+      register: result
+    - debug:
+        var: result

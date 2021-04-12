@@ -1,0 +1,10 @@
+kubectl           Execute tasks in pods running on Kubernetes
+napalm            Provides persistent connection using NAPALM
+qubes             Interact with an existing QubesOS AppVM
+libvirt_lxc       Run tasks in lxc containers via libvirt
+funcd             Use funcd to connect to target
+chroot            Interact with local chroot
+psrp              Run tasks over Microsoft PowerShell Remoting Protocol
+zone              Run tasks in a zone instance
+winrm             Run tasks over Microsoft's WinRM
+paramiko_ssh      Run tasks via python ssh (paramiko)

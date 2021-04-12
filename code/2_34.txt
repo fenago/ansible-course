@@ -1,0 +1,14 @@
+$ ansible-playbook -i localhost, jinja2-filtering3.yml
+
+PLAY [Jinja2 filtering demo 3] *************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [localhost]
+
+TASK [debug] *******************************************************************
+ok: [localhost] => {
+    "msg": "ping value is 127.0.0.1 localhost localhost.localdomain localhost4 localhost4.localdomain4\n::1 localhost localhost.localdomain localhost6 localhost6.localdomain6\n\n"
+}
+
+PLAY RECAP *********************************************************************
+localhost : ok=2 changed=0 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0

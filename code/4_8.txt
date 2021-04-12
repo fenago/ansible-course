@@ -1,0 +1,16 @@
+$ ansible-playbook -i hosts installapache.yml
+
+PLAY [Install Apache] **********************************************************
+
+TASK [Install Apache package] **************************************************
+changed: [frt01.example.com]
+
+TASK [Open firewall for Apache] ************************************************
+changed: [frt01.example.com] => (item=http)
+changed: [frt01.example.com] => (item=https)
+
+TASK [Restart and enable the service] ******************************************
+changed: [frt01.example.com]
+
+PLAY RECAP *********************************************************************
+frt01.example.com : ok=2 changed=3 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0

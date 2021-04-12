@@ -1,0 +1,6 @@
+$ ansible 2.9.6
+  config file = None
+  configured module search path = ['/Users/james/.ansible/plugins/modules', '/usr/share/ansible/plugins/modules']
+  ansible python module location = /usr/local/Cellar/ansible/2.9.6_1/libexec/lib/python3.8/site-packages/ansible
+  executable location = /usr/local/bin/ansible
+  python version = 3.8.2 (default, Mar 11 2020, 00:28:52) [Clang 11.0.0 (clang-1100.0.33.17)]

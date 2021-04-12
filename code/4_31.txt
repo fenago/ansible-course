@@ -1,0 +1,33 @@
+$ ansible-playbook -i hosts blocks.yml
+
+PLAY [Conditional block play] **************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [app02.example.com]
+ok: [frt01.example.com]
+ok: [app01.example.com]
+ok: [frt02.example.com]
+
+TASK [Install the Apache package] **********************************************
+changed: [frt01.example.com]
+changed: [frt02.example.com]
+skipping: [app01.example.com]
+skipping: [app02.example.com]
+
+TASK [Install the templated configuration to a dummy location] *****************
+changed: [frt01.example.com]
+changed: [frt02.example.com]
+skipping: [app01.example.com]
+skipping: [app02.example.com]
+
+TASK [Start the httpd service] *************************************************
+changed: [frt01.example.com]
+changed: [frt02.example.com]
+skipping: [app01.example.com]
+skipping: [app02.example.com]
+
+PLAY RECAP *********************************************************************
+app01.example.com : ok=1 changed=0 unreachable=0 failed=0 skipped=3 rescued=0 ignored=0
+app02.example.com : ok=1 changed=0 unreachable=0 failed=0 skipped=3 rescued=0 ignored=0
+frt01.example.com : ok=4 changed=3 unreachable=0 failed=0 skipped=3 rescued=0 ignored=0
+frt02.example.com : ok=4 changed=3 unreachable=0 failed=0 skipped=3 rescued=0 ignored=0

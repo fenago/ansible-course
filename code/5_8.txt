@@ -1,0 +1,24 @@
+$ cd ansible$ python 3 -m venv venv
+$ . venv/bin/activate
+(venv) $ source hacking/env-setup
+running egg_info
+creating lib/ansible.egg-info
+writing lib/ansible.egg-info/PKG-INFO
+writing dependency_links to lib/ansible.egg-info/dependency_links.txt
+writing requirements to lib/ansible.egg-info/requires.txt
+writing top-level names to lib/ansible.egg-info/top_level.txt
+writing manifest file 'lib/ansible.egg-info/SOURCES.txt'
+reading manifest file 'lib/ansible.egg-info/SOURCES.txt'
+reading manifest template 'MANIFEST.in'
+warning: no files found matching 'SYMLINK_CACHE.json'
+writing manifest file 'lib/ansible.egg-info/SOURCES.txt'
+
+Setting up Ansible to run out of checkout...
+
+PATH=/home/james/ansible/bin:/home/james/ansible/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/home/james/bin
+PYTHONPATH=/home/james/ansible/lib
+MANPATH=/home/james/ansible/docs/man:/usr/local/share/man:/usr/share/man
+
+Remember, you may wish to specify your host file with -i
+
+Done!

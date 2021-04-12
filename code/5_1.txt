@@ -1,0 +1,20 @@
+$ ansible-doc aws_s3
+> AWS_S3 (/usr/lib/python2.7/site-packages/ansible/modules/cloud/amazon/aws_s
+
+        This module allows the user to manage S3 buckets and the
+        objects within them. Includes support for creating and
+        deleting both objects and buckets, retrieving objects as files
+        or strings and generating download links. This module has a
+        dependency on boto3 and botocore.
+
+  * This module is maintained by The Ansible Core Team
+  * note: This module has a corresponding action plugin.
+
+OPTIONS (= is mandatory):
+
+- aws_access_key
+        AWS access key id. If not set then the value of the
+        AWS_ACCESS_KEY environment variable is used.
+        (Aliases: ec2_access_key, access_key)[Default: (null)]
+        type: str
+....

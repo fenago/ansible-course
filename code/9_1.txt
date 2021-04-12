@@ -1,0 +1,13 @@
+vx01.example.com | SUCCESS => {
+    "ansible_facts": {
+        "ansible_swp1": {
+            "active": false,
+            "device": "swp1",
+            "features": {
+                "esp_hw_offload": "off [fixed]",
+                "esp_tx_csum_hw_offload": "off [fixed]",
+                "fcoe_mtu": "off [fixed]",
+                "generic_receive_offload": "on",
+                "generic_segmentation_offload": "on",
+                "highdma": "off [fixed]",
+...

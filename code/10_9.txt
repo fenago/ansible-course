@@ -1,0 +1,12 @@
+ERROR! 'msg' is not a valid attribute for a Task
+
+The error appears to be in '/home/fale/ansible/Ansible2Cookbook/Ch11/syntaxcheck.yaml': line 4, column 7, but may
+be elsewhere in the file depending on the exact syntax problem.
+
+The offending line appears to be:
+
+  tasks:
+    - debug:
+      ^ here
+
+This error can be suppressed as a warning using the "invalid_task_attribute_failed" configuration

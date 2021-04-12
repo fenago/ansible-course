@@ -1,0 +1,25 @@
+$ ansible-playbook -i hosts tags.yml --skip-tags customize --list-tasks
+
+playbook: tags.yml
+
+  play #1 (frontends): Simple play to demonstrate use of tags TAGS: []
+    tasks:
+      Install nginx TAGS: [install]
+
+$ ansible-playbook -i hosts tags.yml --tags install,customize --list-tasks
+
+playbook: tags.yml
+
+  play #1 (frontends): Simple play to demonstrate use of tags TAGS: []
+    tasks:
+      Install nginx TAGS: [install]
+      Install nginx configuration from template TAGS: [customize]
+
+$ ansible-playbook -i hosts tags.yml --list-tasks
+
+playbook: tags.yml
+
+  play #1 (frontends): Simple play to demonstrate use of tags TAGS: []
+    tasks:
+      Install nginx TAGS: [install]
+      Install nginx configuration from template TAGS: [customize]

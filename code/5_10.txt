@@ -1,0 +1,14 @@
+ REMOTE_FILECOPY (/home/james/ansible/moduledev/remote_filecopy.py)
+
+        The remote_copy module copies a file on the remote host from a
+        given source to a provided destination.
+
+  * This module is maintained by The Ansible Community
+OPTIONS (= is mandatory):
+
+= dest
+        Path to the destination on the remote host for the copy
+
+
+= source
+        Path to a file on the source file on the remote host

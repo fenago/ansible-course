@@ -1,0 +1,10 @@
+$ ansible -i production-inventory frontend2-emea.example.com -m async_status -a "jid=651461662130.8858"
+frontend2-emea.example.com | SUCCESS => {
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python"
+    },
+    "ansible_job_id": "651461662130.8858",
+    "changed": false,
+    "finished": 0,
+    "started": 1
+}

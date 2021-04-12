@@ -1,0 +1,13 @@
+roles:
+  - role: dbms_admin
+    vars:
+      username: James
+  - role: system_admin
+    vars:
+      username: John
+  - role: security_amdin
+    vars:
+      username: Rock
+  - role: app_admin
+    vars:
+      username: Daniel

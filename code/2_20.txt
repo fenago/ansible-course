@@ -1,0 +1,14 @@
+$ ansible -i production-inventory frontends_emea_zone -a /usr/sbin/pvs -u danieloh
+
+frontend2-emea.example.com | FAILED | rc=5 >>
+  WARNING: Running as a non-root user. Functionality may be unavailable.
+  /run/lvm/lvmetad.socket: access failed: Permission denied
+  WARNING: Failed to connect to lvmetad. Falling back to device scanning.
+  /run/lock/lvm/P_global:aux: open failed: Permission denied
+  Unable to obtain global lock.non-zero return code
+frontend1-emea.example.com | FAILED | rc=5 >>
+  WARNING: Running as a non-root user. Functionality may be unavailable.
+  /run/lvm/lvmetad.socket: access failed: Permission denied
+  WARNING: Failed to connect to lvmetad. Falling back to device scanning.
+  /run/lock/lvm/P_global:aux: open failed: Permission denied
+  Unable to obtain global lock.non-zero return code

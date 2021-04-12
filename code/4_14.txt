@@ -1,0 +1,29 @@
+$ ansible-playbook -i hosts site.yml
+
+PLAY [Role variables and meta playbook] ****************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [frt01.example.com]
+
+TASK [version : Print type variable] *******************************************
+ok: [frt01.example.com] => {
+    "type": "centos"
+}
+
+TASK [network : Print type variable] *******************************************
+ok: [frt01.example.com] => {
+    "type": "centos"
+}
+
+TASK [version : Print type variable] *******************************************
+ok: [frt01.example.com] => {
+    "type": "ubuntu"
+}
+
+TASK [network : Print type variable] *******************************************
+ok: [frt01.example.com] => {
+    "type": "ubuntu"
+}
+
+PLAY RECAP *********************************************************************
+frt01.example.com : ok=5 changed=0 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0

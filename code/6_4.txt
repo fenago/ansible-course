@@ -1,0 +1,10 @@
+$ ls -al connection/
+total 176
+drwxr-xr-x 2 root root 109 Apr 15 17:24 .
+drwxr-xr-x 19 root root 297 Apr 15 17:24 ..
+-rw-r--r-- 1 root root 16411 Apr 15 17:24 __init__.py
+-rw-r--r-- 1 root root 6855 Apr 15 17:24 local.py
+-rw-r--r-- 1 root root 23525 Apr 15 17:24 paramiko_ssh.py
+-rw-r--r-- 1 root root 32839 Apr 15 17:24 psrp.py
+-rw-r--r-- 1 root root 55367 Apr 15 17:24 ssh.py
+-rw-r--r-- 1 root root 31277 Apr 15 17:24 winrm.py

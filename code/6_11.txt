@@ -1,0 +1,34 @@
+$ . hacking/env-setup
+running egg_info
+creating lib/ansible.egg-info
+writing requirements to lib/ansible.egg-info/requires.txt
+writing lib/ansible.egg-info/PKG-INFO
+writing top-level names to lib/ansible.egg-info/top_level.txt
+writing dependency_links to lib/ansible.egg-info/dependency_links.txt
+writing manifest file 'lib/ansible.egg-info/SOURCES.txt'
+reading manifest file 'lib/ansible.egg-info/SOURCES.txt'
+reading manifest template 'MANIFEST.in'
+warning: no files found matching 'SYMLINK_CACHE.json'
+writing manifest file 'lib/ansible.egg-info/SOURCES.txt'
+
+Setting up Ansible to run out of checkout...
+
+PATH=/home/james/ansible/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/root/bin
+PYTHONPATH=/home/james/ansible/lib
+MANPATH=/home/james/ansible/docs/man:/usr/local/share/man:/usr/share/man
+
+Remember, you may wish to specify your host file with -i
+
+Done!
+
+$ ansible-doc -t lookup firstchar
+> FIRSTCHAR (/home/james/ansible/lib/ansible/plugins/lookup/firstchar.py)
+
+        This lookup returns the first character of the contents from a
+        file on the Ansible controller's file system.
+
+  * This module is maintained by The Ansible Community
+OPTIONS (= is mandatory):
+
+= _terms
+        path(s) of files to read

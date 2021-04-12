@@ -1,0 +1,21 @@
+$ ansible-playbook -i hosts myplaybook.yaml
+
+PLAY [frontends] ***************************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [frt02.example.com]
+ok: [frt01.example.com]
+
+TASK [simple connection test] **************************************************
+ok: [frt01.example.com]
+ok: [frt02.example.com]
+
+TASK [run a simple command] ****************************************************
+fatal: [frt02.example.com]: FAILED! => {"changed": true, "cmd": "/bin/ls -al /nonexistent", "delta": "0:00:00.015687", "end": "2020-04-10 16:37:56.895520", "msg": "non-zero return code", "rc": 2, "start": "2020-04-10 16:37:56.879833", "stderr": "/bin/ls: cannot access /nonexistent: No such file or directory", "stderr_lines": ["/bin/ls: cannot access /nonexistent: No such file or directory"], "stdout": "", "stdout_lines": []}
+...ignoring
+fatal: [frt01.example.com]: FAILED! => {"changed": true, "cmd": "/bin/ls -al /nonexistent", "delta": "0:00:00.012160", "end": "2020-04-10 16:37:56.930058", "msg": "non-zero return code", "rc": 2, "start": "2020-04-10 16:37:56.917898", "stderr": "/bin/ls: cannot access /nonexistent: No such file or directory", "stderr_lines": ["/bin/ls: cannot access /nonexistent: No such file or directory"], "stdout": "", "stdout_lines": []}
+...ignoring
+
+PLAY RECAP *********************************************************************
+frt01.example.com : ok=3 changed=1 unreachable=0 failed=0 skipped=0 rescued=0 ignored=1
+frt02.example.com : ok=3 changed=1 unreachable=0 failed=0 skipped=0 rescued=0 ignored=1

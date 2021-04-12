@@ -1,0 +1,16 @@
+$ ansible-playbook -i hosts serial.yml
+
+PLAY [Simple serial demonstration play] ****************************************
+
+TASK [First task] **************************************************************
+changed: [frt02.example.com]
+changed: [frt01.example.com]
+
+TASK [Second task] *************************************************************
+changed: [frt01.example.com]
+changed: [frt02.example.com]
+
+
+PLAY RECAP *********************************************************************
+frt01.example.com : ok=2 changed=2 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0
+frt02.example.com : ok=2 changed=2 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0

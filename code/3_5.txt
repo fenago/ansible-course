@@ -1,0 +1,8 @@
+[cobbler]
+
+# Specify IP address or Hostname of the cobbler server. The default variable is here:
+host = http://127.0.0.1/cobbler_api
+
+# (Optional) With caching, you will have responses of API call with the cobbler server quicker
+cache_path = /tmp
+cache_max_age = 900

@@ -1,0 +1,22 @@
+$ ansible -i production-inventory frontend2-emea.example.com -m async_status -a "jid=651461662130.8858"
+frontend2-emea.example.com | FAILED! => {
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python"
+    },
+    "ansible_job_id": "651461662130.8858",
+    "changed": true,
+    "cmd": [
+        "sleep",
+        "2h"
+    ],
+    "delta": "0:03:16.534212",
+    "end": "2020-04-05 19:18:08.431258",
+    "finished": 1,
+    "msg": "non-zero return code",
+    "rc": -15,
+    "start": "2020-04-05 19:14:51.897046",
+    "stderr": "",
+    "stderr_lines": [],
+    "stdout": "",
+    "stdout_lines": []
+}

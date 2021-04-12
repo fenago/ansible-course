@@ -1,0 +1,10 @@
+$ ansible -i hosts -m ping -u cumulus --ask-pass bastion_cumulusvx
+SSH password:
+
+vx01.example.com | SUCCESS => {
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python"
+    },
+    "changed": false,
+    "ping": "pong"
+}

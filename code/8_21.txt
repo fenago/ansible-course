@@ -1,0 +1,20 @@
+$ ansible-playbook -i hosts vaultplaybook.yml --ask-vault-pass
+Vault password:
+
+PLAY [A play that makes use of an Ansible Vault] *******************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [frt01.example.com]
+ok: [frt02.example.com]
+
+TASK [Tell me a secret] ********************************************************
+ok: [frt01.example.com] => {
+    "msg": "Your secret data is: Ansible is cool!"
+}
+ok: [frt02.example.com] => {
+    "msg": "Your secret data is: Ansible is cool!"
+}
+
+PLAY RECAP *********************************************************************
+frt01.example.com : ok=2 changed=0 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0
+frt02.example.com : ok=2 changed=0 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0

@@ -1,0 +1,20 @@
+$ ansible-galaxy role init --init-path roles/ testrole
+- Role testrole was created successfully
+$ tree roles/testrole/
+roles/testrole/
+├── defaults
+│   └── main.yml
+├── files
+├── handlers
+│   └── main.yml
+├── meta
+│   └── main.yml
+├── README.md
+├── tasks
+│   └── main.yml
+├── templates
+├── tests
+│   ├── inventory
+│   └── test.yml
+└── vars
+    └── main.yml 

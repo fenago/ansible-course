@@ -1,0 +1,15 @@
+$ ansible-playbook -i hosts tags.yml --tags install
+
+PLAY [Simple play to demonstrate use of tags] **********************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [frt02.example.com]
+ok: [frt01.example.com]
+
+TASK [Install nginx] ***********************************************************
+changed: [frt02.example.com]
+changed: [frt01.example.com]
+
+PLAY RECAP *********************************************************************
+frt01.example.com : ok=2 changed=1 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0
+frt02.example.com : ok=2 changed=1 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0

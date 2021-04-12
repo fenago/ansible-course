@@ -1,0 +1,15 @@
+$ ansible-playbook -i production-inventory appservers-emea.yml
+
+PLAY [appservers_emea_zone] ****************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [appserver2-emea.example.com]
+ok: [appserver1-emea.example.com]
+
+TASK [simple connection test] **************************************************
+ok: [appserver2-emea.example.com]
+ok: [appserver1-emea.example.com]
+
+PLAY RECAP *********************************************************************
+appserver1-emea.example.com : ok=2 changed=0 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0
+appserver2-emea.example.com : ok=2 changed=0 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0 

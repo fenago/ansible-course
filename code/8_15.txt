@@ -1,0 +1,21 @@
+$ ansible-playbook -i hosts prompt.yml
+Enter your username: james
+Enter your password:
+
+PLAY [A simple play to demonstrate prompting in a playbook] ********************
+
+TASK [Gathering Facts] *********************************************************
+ok: [frt01.example.com]
+ok: [frt02.example.com]
+
+TASK [Proceed with login] ******************************************************
+ok: [frt01.example.com] => {
+    "msg": "Logging in as james..."
+}
+ok: [frt02.example.com] => {
+    "msg": "Logging in as james..."
+}
+
+PLAY RECAP *********************************************************************
+frt01.example.com : ok=2 changed=0 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0
+frt02.example.com : ok=2 changed=0 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0

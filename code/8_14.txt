@@ -1,0 +1,16 @@
+$ ansible -i switches -m ping all
+cmls02.example.com | SUCCESS => {
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python"
+    },
+    "changed": false,
+127.0.0.1 app02.example.com
+    "ping": "pong"
+}
+cmls01.example.com | SUCCESS => {
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python"
+    },
+    "changed": false,
+    "ping": "pong"
+}

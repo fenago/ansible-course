@@ -1,0 +1,43 @@
+$ ansible-playbook -i hosts blocks-error.yml
+
+PLAY [Play to demonstrate block error handling] ********************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [frt02.example.com]
+ok: [frt01.example.com]
+
+TASK [Perform a successful task] ***********************************************
+ok: [frt01.example.com] => {
+    "msg": "Normally executing...."
+}
+ok: [frt02.example.com] => {
+    "msg": "Normally executing...."
+}
+
+TASK [Deliberately create an error] ********************************************
+fatal: [frt01.example.com]: FAILED! => {"changed": false, "cmd": "/bin/whatever", "msg": "[Errno 2] No such file or directory", "rc": 2}
+fatal: [frt02.example.com]: FAILED! => {"changed": false, "cmd": "/bin/whatever", "msg": "[Errno 2] No such file or directory", "rc": 2}
+
+TASK [Catch the error (and perform recovery actions)] **************************
+ok: [frt01.example.com] => {
+    "msg": "Caught the error"
+}
+ok: [frt02.example.com] => {
+    "msg": "Caught the error"
+}
+
+TASK [Deliberately create another error] ***************************************
+fatal: [frt01.example.com]: FAILED! => {"changed": false, "cmd": "/bin/whatever", "msg": "[Errno 2] No such file or directory", "rc": 2}
+fatal: [frt02.example.com]: FAILED! => {"changed": false, "cmd": "/bin/whatever", "msg": "[Errno 2] No such file or directory", "rc": 2}
+
+TASK [This task always runs!] **************************************************
+ok: [frt01.example.com] => {
+    "msg": "Tasks in this part of the play will be ALWAYS executed!!!!"
+}
+ok: [frt02.example.com] => {
+    "msg": "Tasks in this part of the play will be ALWAYS executed!!!!"
+}
+
+PLAY RECAP *********************************************************************
+frt01.example.com : ok=4 changed=0 unreachable=0 failed=1 skipped=0 rescued=1 ignored=0
+frt02.example.com : ok=4 changed=0 unreachable=0 failed=1 skipped=0 rescued=1 ignored=0

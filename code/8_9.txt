@@ -1,0 +1,9 @@
+---
+- name: Play to demonstrate the run_once directive
+  hosts: frontends
+
+  tasks:
+    - name: Upgrade database schema
+      debug:
+        msg: Upgrading database schema...
+      run_once: true

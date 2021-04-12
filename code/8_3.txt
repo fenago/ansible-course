@@ -1,0 +1,27 @@
+$ ansible-playbook -i hosts async2.yml
+
+PLAY [Play to demonstrate asynchronous tasks] **********************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [frt01.example.com]
+ok: [frt02.example.com]
+
+TASK [A simulated long running task] *******************************************
+changed: [frt02.example.com]
+changed: [frt01.example.com]
+
+TASK [Check on the asynchronous task] ******************************************
+FAILED - RETRYING: Check on the asynchronous task (30 retries left).
+FAILED - RETRYING: Check on the asynchronous task (30 retries left).
+FAILED - RETRYING: Check on the asynchronous task (29 retries left).
+FAILED - RETRYING: Check on the asynchronous task (29 retries left).
+FAILED - RETRYING: Check on the asynchronous task (28 retries left).
+FAILED - RETRYING: Check on the asynchronous task (28 retries left).
+FAILED - RETRYING: Check on the asynchronous task (27 retries left).
+FAILED - RETRYING: Check on the asynchronous task (27 retries left).
+changed: [frt01.example.com]
+changed: [frt02.example.com]
+
+PLAY RECAP *********************************************************************
+frt01.example.com : ok=3 changed=2 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0
+frt02.example.com : ok=3 changed=2 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0

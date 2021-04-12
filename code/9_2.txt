@@ -1,0 +1,9 @@
+SSH password:
+
+PLAY [Simply play to gather Cumulus VX switch facts] ************************************************************************************************
+
+TASK [Gather facts] ************************************************************************************************
+ok: [vx01.example.com]
+
+PLAY RECAP ************************************************************************************************
+vx01.example.com : ok=1 changed=0 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0

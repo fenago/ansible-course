@@ -1,0 +1,9 @@
+$selector_set = @{
+    Address = "*"
+    Transport = "HTTPS"
+}
+$value_set = @{
+    CertificateThumbprint = "E6CDAA82EEAF2ECE8546E05DB7F3E01AA47D76CE"
+}
+
+New-WSManInstance -ResourceURI "winrm/config/Listener" -SelectorSet $selector_set -ValueSet $value_set

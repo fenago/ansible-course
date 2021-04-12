@@ -1,0 +1,31 @@
+$ ansible-playbook -i localhost, jinja-filtering1.yml
+
+PLAY [Jinja2 filtering demo 1] *************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [localhost]
+
+TASK [copy] ********************************************************************
+ok: [localhost]
+
+TASK [shell] *******************************************************************
+changed: [localhost]
+
+TASK [debug] *******************************************************************
+ok: [localhost] => (item={'tags': [{'value': u'developer', 'key': u'job'}, {'value': u'java', 'key': u'language'}]}) => {
+    "msg": {
+        "tags": [
+            {
+                "key": "job",
+                "value": "developer"
+            },
+            {
+                "key": "language",
+                "value": "java"
+            }
+        ]
+    }
+}
+
+PLAY RECAP *********************************************************************
+localhost : ok=4 changed=1 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0

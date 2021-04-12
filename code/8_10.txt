@@ -1,0 +1,33 @@
+$ ansible-playbook -i morehosts runonce.yml
+
+PLAY [Play to demonstrate the run_once directive] ******************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [frt02.example.com]
+ok: [frt05.example.com]
+ok: [frt03.example.com]
+ok: [frt01.example.com]
+ok: [frt04.example.com]
+ok: [frt06.example.com]
+ok: [frt08.example.com]
+ok: [frt09.example.com]
+ok: [frt07.example.com]
+ok: [frt10.example.com]
+
+TASK [Upgrade database schema] *************************************************
+ok: [frt01.example.com] => {
+    "msg": "Upgrading database schema..."
+}
+---
+
+PLAY RECAP *********************************************************************
+frt01.example.com : ok=2 changed=0 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0
+frt02.example.com : ok=1 changed=0 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0
+frt03.example.com : ok=1 changed=0 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0
+frt04.example.com : ok=1 changed=0 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0
+frt05.example.com : ok=1 changed=0 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0
+frt06.example.com : ok=1 changed=0 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0
+frt07.example.com : ok=1 changed=0 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0
+frt08.example.com : ok=1 changed=0 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0
+frt09.example.com : ok=1 changed=0 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0
+frt10.example.com : ok=1 changed=0 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0

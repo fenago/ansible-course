@@ -1,0 +1,30 @@
+$ touch /tmp/foo
+$ . moduledev/bin/activate
+(moduledev) $ . hacking/env-setup
+running egg_info
+creating lib/ansible_base.egg-info
+writing requirements to lib/ansible_base.egg-info/requires.txt
+writing lib/ansible_base.egg-info/PKG-INFO
+writing top-level names to lib/ansible_base.egg-info/top_level.txt
+writing dependency_links to lib/ansible_base.egg-info/dependency_links.txt
+writing manifest file 'lib/ansible_base.egg-info/SOURCES.txt'
+reading manifest file 'lib/ansible_base.egg-info/SOURCES.txt'
+reading manifest template 'MANIFEST.in'
+warning: no files found matching 'SYMLINK_CACHE.json'
+warning: no previously-included files found matching 'docs/docsite/rst_warnings'
+warning: no previously-included files matching '*' found under directory 'docs/docsite/_build'
+warning: no previously-included files matching '*.pyc' found under directory 'docs/docsite/_extensions'
+warning: no previously-included files matching '*.pyo' found under directory 'docs/docsite/_extensions'
+warning: no files found matching '*.ps1' under directory 'lib/ansible/modules/windows'
+warning: no files found matching '*.psm1' under directory 'test/support'
+writing manifest file 'lib/ansible_base.egg-info/SOURCES.txt'
+
+Setting up Ansible to run out of checkout...
+
+PATH=/home/james/ansible/bin:/home/james/ansible/moduledev/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/home/james/bin
+PYTHONPATH=/home/james/ansible/lib
+MANPATH=/home/james/ansible/docs/man:/usr/local/share/man:/usr/share/man
+
+Remember, you may wish to specify your host file with -i
+
+Done!

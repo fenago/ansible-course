@@ -1,0 +1,13 @@
+$ ansible -i localhosts -m ping all --ask-pass
+The authenticity of host 'localhost (::1)' can't be established.
+ECDSA key fingerprint is SHA256:DUwVxH+45432pSr9qsN8Av4l0KJJ+r5jTo123n3XGvZs.
+ECDSA key fingerprint is MD5:78:d1:dc:23:cc:28:51:42:eb:fb:58:49:ab:92:b6:96.
+Are you sure you want to continue connecting (yes/no)? yes
+SSH password:
+localhost | SUCCESS => {
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python"
+    },
+    "changed": false,
+    "ping": "pong"
+}

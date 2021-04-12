@@ -1,0 +1,27 @@
+$ ansible-playbook -i hosts delegate.yml
+
+PLAY [Play to demonstrate task delegation] *************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [frt01.example.com]
+ok: [frt02.example.com]
+
+TASK [Remove host from the load balancer] **************************************
+changed: [frt02.example.com -> localhost]
+changed: [frt01.example.com -> localhost]
+
+TASK [Deploy code to host] *****************************************************
+ok: [frt01.example.com] => {
+    "msg": "Deployment code would go here...."
+}
+ok: [frt02.example.com] => {
+    "msg": "Deployment code would go here...."
+}
+
+TASK [Add host back to the load balancer] **************************************
+changed: [frt01.example.com -> localhost]
+changed: [frt02.example.com -> localhost]
+
+PLAY RECAP *********************************************************************
+frt01.example.com : ok=4 changed=2 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0
+frt02.example.com : ok=4 changed=2 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0

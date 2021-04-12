@@ -1,0 +1,19 @@
+$ ansible-playbook -i inventories/development/hosts site.yml
+
+PLAY [Play using best practise directory structure] ****************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [app02.dev.example.com]
+ok: [app01.dev.example.com]
+
+TASK [Display the value of our inventory variable] *****************************
+ok: [app01.dev.example.com] => {
+    "http_port": 8081
+}
+ok: [app02.dev.example.com] => {
+    "http_port": 8081
+}
+
+PLAY RECAP *********************************************************************
+app01.dev.example.com : ok=2 changed=0 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0
+app02.dev.example.com : ok=2 changed=0 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0

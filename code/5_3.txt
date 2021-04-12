@@ -1,0 +1,19 @@
+DOCUMENTATION = '''
+---
+module: remote_filecopy
+version_added: "2.9"
+short_description: Copy a file on the remote host
+description:
+  - The remote_copy module copies a file on the remote host from a given source to a provided destination.
+options:
+  source:
+    description:
+      - Path to a file on the source file on the remote host
+    required: True
+  dest:
+    description:
+      - Path to the destination on the remote host for the copy
+    required: True
+author:
+- Jesse Keating (@omgjlk)
+'''

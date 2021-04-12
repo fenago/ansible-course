@@ -1,0 +1,29 @@
+$ ansible-playbook -i hosts osvariants.yml
+
+PLAY [Play to demonstrate group_by module] *************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [app02.dev.example.com]
+ok: [app01.dev.example.com]
+
+TASK [Create inventory groups based on host facts] *****************************
+ok: [app01.dev.example.com]
+ok: [app02.dev.example.com]
+
+PLAY [Play to install Apache on CentOS] ****************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [app01.dev.example.com]
+ok: [app02.dev.example.com]
+
+TASK [Install Apache on CentOS] ************************************************
+changed: [app02.dev.example.com]
+changed: [app01.dev.example.com]
+[WARNING]: Could not match supplied host pattern, ignoring: os_Ubuntu
+
+PLAY [Play to install Apache on Ubuntu] ****************************************
+skipping: no hosts matched
+
+PLAY RECAP *********************************************************************
+app01.dev.example.com : ok=4 changed=2 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0
+app02.dev.example.com : ok=4 changed=2 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0

@@ -1,0 +1,5 @@
+$ ls /usr/lib/python2.7/site-packages/ansible/plugins/
+action    cliconf       httpapi        inventory    lookup     terminal
+become    connection    __init__.py    loader.py    netconf    test
+cache     doc_fragments __init__.pyc   loader.pyc   shell      vars
+callback  filter        __init__.pyo   loader.pyo   strategy

@@ -1,0 +1,11 @@
+$ ansible-playbook -i hosts myplugin.yml
+
+PLAY [Play to demonstrate our custom filter] ***********************************
+
+TASK [make a statement] ********************************************************
+ok: [frt01.example.com] => {
+    "msg": "Ansible is an excellent automation tool!"
+}
+
+PLAY RECAP *********************************************************************
+frt01.example.com : ok=1 changed=0 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0

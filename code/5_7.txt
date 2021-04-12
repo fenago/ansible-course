@@ -1,0 +1,29 @@
+$ ansible-playbook -i hosts testplaybook.yml
+
+PLAY [Playbook to test custom module] ******************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [frt01.example.com]
+ok: [app01.example.com]
+
+TASK [Test the custom module] **************************************************
+changed: [app01.example.com]
+changed: [frt01.example.com]
+
+TASK [Print the test result data] **********************************************
+ok: [app01.example.com] => {
+    "testresult": {
+        "changed": true,
+        "failed": false
+    }
+}
+ok: [frt01.example.com] => {
+    "testresult": {
+        "changed": true,
+        "failed": false
+    }
+}
+
+PLAY RECAP *********************************************************************
+app01.example.com : ok=3 changed=1 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0
+frt01.example.com : ok=3 changed=1 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0

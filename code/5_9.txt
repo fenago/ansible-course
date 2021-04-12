@@ -1,0 +1,6 @@
+(venv) $ cp ~/moduledev/remote_filecopy.py ./lib/ansible/modules/files/
+(venv) $ ansible-test sanity --test validate-modules remote_filecopy
+Sanity check using validate-modules
+WARNING: Cannot perform module comparison against the base branch. Base branch not detected when running locally.
+WARNING: Reviewing previous 1 warning(s):
+WARNING: Cannot perform module comparison against the base branch. Base branch not detected when running locally.

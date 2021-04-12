@@ -1,0 +1,36 @@
+.
+├── filter_plugins
+│   ├── custom_filter.py
+│   └── custom_filter.pyc
+├── inventories
+│   ├── development
+│   │   ├── group_vars
+│   │   │   └── app.yml
+│   │   ├── hosts
+│   │   └── host_vars
+│   └── production
+│   ├── group_vars
+│   │   └── app.yml
+│   ├── hosts
+│   └── host_vars
+├── library
+│   └── remote_filecopy.py
+├── roles
+│   └── installapp
+│   ├── defaults
+│   │   └── main.yml
+│   ├── files
+│   ├── handlers
+│   │   └── main.yml
+│   ├── meta
+│   │   └── main.yml
+│   ├── README.md
+│   ├── tasks
+│   │   └── main.yml
+│   ├── templates
+│   ├── tests
+│   │   ├── inventory
+│   │   └── test.yml
+│   └── vars
+│   └── main.yml
+└── site.yml

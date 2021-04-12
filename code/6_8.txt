@@ -1,0 +1,15 @@
+DOCUMENTATION = """
+    lookup: firstchar
+    author: James Freeman <james.freeman@example.com>
+    version_added: "2.9"
+    short_description: read the first character of file contents
+    description:
+        - This lookup returns the first character of the contents from a file on the Ansible controller's file system.
+    options:
+      _terms:
+        description: path(s) of files to read
+        required: True
+    notes:
+      - if read in variable context, the file can be interpreted as YAML if the content is valid to the parser.
+      - this lookup does not understand 'globing', use the fileglob lookup instead.
+"""

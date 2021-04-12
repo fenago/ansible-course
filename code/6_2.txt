@@ -1,0 +1,24 @@
+> PARAMIKO (/usr/lib/python2.7/site-packages/ansible/plugins/connection/param
+
+        Use the python ssh implementation (Paramiko) to connect to
+        targets The paramiko transport is provided because many
+        distributions, in particular EL6 and before do not support
+        ControlPersist in their SSH implementations. This is needed on
+        the Ansible control machine to be reasonably efficient with
+        connections. Thus paramiko is faster for most users on these
+        platforms. Users with ControlPersist capability can consider
+        using -c ssh or configuring the transport in the configuration
+        file. This plugin also borrows a lot of settings from the ssh
+        plugin as they both cover the same protocol.
+
+  * This module is maintained by The Ansible Community
+OPTIONS (= is mandatory):
+
+- host_key_auto_add
+        TODO: write it
+        [Default: (null)]
+        set_via:
+          env:
+          - name: ANSIBLE_PARAMIKO_HOST_KEY_AUTO_ADD
+          ini:
+          - key: host_key_auto_add

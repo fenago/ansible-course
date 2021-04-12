@@ -1,0 +1,39 @@
+$ ansible-playbook -i inventories/production/hosts site.yml
+
+PLAY [Play using best practise directory structure] ****************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [app02.prod.example.com]
+ok: [app01.prod.example.com]
+
+TASK [installapp : Display http_port variable contents] ************************
+ok: [app01.prod.example.com] => {
+    "http_port": 80
+}
+ok: [app02.prod.example.com] => {
+    "http_port": 80
+}
+
+TASK [installapp : Create /tmp/foo] ********************************************
+changed: [app01.prod.example.com]
+changed: [app02.prod.example.com]
+
+TASK [installapp : Use custom module to copy /tmp/foo] *************************
+changed: [app02.prod.example.com]
+changed: [app01.prod.example.com]
+
+TASK [installapp : Define a fact about automation] *****************************
+ok: [app01.prod.example.com]
+ok: [app02.prod.example.com]
+
+TASK [installapp : Tell us about automation with a custom filter applied] ******
+ok: [app01.prod.example.com] => {
+    "msg": "Ansible is an excellent automation tool"
+}
+ok: [app02.prod.example.com] => {
+    "msg": "Ansible is an excellent automation tool"
+}
+
+PLAY RECAP *********************************************************************
+app01.prod.example.com : ok=6 changed=2 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0
+app02.prod.example.com : ok=6 changed=2 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0

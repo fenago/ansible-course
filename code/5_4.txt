@@ -1,0 +1,47 @@
+RETURN = '''
+source:
+  description: source file used for the copy
+  returned: success
+  type: str
+  sample: "/path/to/file.name"
+dest:
+  description: destination of the copy
+  returned: success
+  type: str
+  sample: "/path/to/destination.file"
+gid:
+  description: group ID of destination target
+  returned: success
+  type: int
+  sample: 502
+group:
+  description: group name of destination target
+  returned: success
+  type: str
+  sample: "users"
+uid:
+  description: owner ID of destination target
+  returned: success
+  type: int
+  sample: 502
+owner:
+  description: owner name of destination target
+  returned: success
+  type: str
+  sample: "fred"
+mode:
+  description: permissions of the destination target
+  returned: success
+  type: int
+  sample: 0644
+size:
+  description: size of destination target
+  returned: success
+  type: int
+  sample: 20
+state:
+  description: state of destination target
+  returned: success
+  type: str
+  sample: "file"
+'''

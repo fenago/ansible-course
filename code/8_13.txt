@@ -1,0 +1,15 @@
+$ ansible -i localhosts2 -m file -a "path=/tmp/foo state=touch" all
+frt01.example.com | CHANGED => {
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python"
+    },
+    "changed": true,
+    "dest": "/tmp/foo",
+    "gid": 0,
+    "group": "root",
+    "mode": "0644",
+    "owner": "root",
+    "size": 0,
+    "state": "file",
+    "uid": 0
+}

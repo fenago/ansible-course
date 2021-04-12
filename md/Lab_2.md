@@ -17,6 +17,12 @@ In this lab, we will cover the following topics:
 -   Understanding Jinja2 filters
 
 
+#### Lab Environment
+
+All lab file are present at below path. Run following command in the terminal first before running commands in the lab:
+
+`cd ~/Desktop/ansible-course/Lab_2` 
+
 
 Getting familiar with the Ansible framework
 ===========================================

@@ -18,6 +18,12 @@ Specifically, in this lab, we will cover the following topics:
 -   Using [ansible-pull]
 
 
+#### Lab Environment
+
+All lab file are present at below path. Run following command in the terminal first before running commands in the lab:
+
+`cd ~/Desktop/ansible-course/Lab_4` 
+
 
 Understanding the playbook framework
 ====================================
@@ -32,8 +38,6 @@ this for the first time, perhaps Vim, Visual Studio Code, or Eclipse, as
 these will help you to ensure that your indentation is correct. To test
 the playbooks we develop in this lab, we will reuse a variant of an
 inventory created in Lab 3 (unless stated otherwise):
-
-
 
 
 ```
@@ -132,34 +136,18 @@ because we set [ignore\_errors] to [true] for this task (and
 only this task).
 
 
-Every module returns a set of results and among these results is the
-task status. You can see these summarized at the bottom of the preceding
-playbook run output, and their meaning is as follows:
-
--   [ok]: The task ran successfully and no changes were made.
--   [changed]: The task ran successfully and a change was made.
--   [failed]: The task failed to run.
--   [unreachable]: The host was unreachable to run the task on.
--   [skipped]: This task was skipped.
--   [ignored]: This task was ignored (for example, in the case of
-    [ignore\_errors]).
--   [rescued]: We will see an example of this later when we look
-    at blocks and rescue tasks.
-
-These statuses can be very useful---for example, if we have a task to
-deploy a new Apache configuration file from a template, we know we must
-restart the Apache service for the changes to be picked up. However, we
-only want to do this if the file was actually changed---if no changes
-were made, we don\'t want to needlessly restart Apache as it would
-interrupt people who might be using the service. Hence, we can use the
-[notify] action, which tells Ansible to call a [handler]
-when (and only when) the result from a task is [changed]. In
-brief, a handler is a special type of task that is run as a result of a
+A handler is a special type of task that is run as a result of a
 [notify]. However, unlike Ansible playbook tasks, which are
 performed in sequence, handlers are all grouped together and run at the
 very end of the play. Also, they can be notified more than once but will
 only be run once regardless, again preventing needless service restarts.
 Consider the following playbook:
+
+
+#### Change Apache Port
+
+Let's change the default Apache port using template as port 80 is already in use by lab environment.
+
 
 ```
 ---
@@ -172,7 +160,7 @@ Consider the following playbook:
     - name: Update Apache configuration
       template:
         src: template.j2
-        dest: /etc/apache2/apache2.conf
+        dest: /etc/apache2/ports.conf
       notify: Restart Apache
 
   handlers:
@@ -182,12 +170,12 @@ Consider the following playbook:
         state: restarted
 ```
 
+### ProTip
+
+Open http://localhost:80 in browser to verify that apache is running now.
 
 
-To keep the output concise, I\'ve turned off fact-gathering for this
-playbook (we won\'t use them in any of the tasks). I\'m also running
-this on just one host again for conciseness, but you are welcome to
-expand the demo code as you wish. If we run this task a first time, we
+If we run this task a first time, we
 will see the following results:
 
 ```
@@ -204,6 +192,14 @@ changed: [frt01.example.com]
 PLAY RECAP *********************************************************************
 frt01.example.com : ok=2 changed=2 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0
 ```
+
+<span style="color:red;">Note: You will get and error because port 80 is already in use. We can change the port as shown the next step.</span>
+
+
+#### Change Apache Port
+
+We can change the default Apache port. Open `/etc/apache2/ports.conf` and update `80` with port `81`. Save and close the file.
+
 
 Notice how the handler was run at the end, as the configuration file was
 updated. However, if we run this playbook a second time without making
@@ -238,9 +234,9 @@ following example:
   become: yes
 
   handlers:
-    - name: restart chronyd
+    - name: restart ntp
       service:
-        name: chronyd
+        name: ntp
         state: restarted
       listen: "restart all services"
     - name: restart apache
@@ -272,7 +268,7 @@ PLAY [Handler demo 1] **********************************************************
 TASK [restart all services] ****************************************************
 changed: [frt01.example.com]
 
-RUNNING HANDLER [restart chronyd] **********************************************
+RUNNING HANDLER [restart ntp] **********************************************
 changed: [frt01.example.com]
 
 RUNNING HANDLER [restart apache] ***********************************************

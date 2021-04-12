@@ -17,6 +17,12 @@ In this lab, we will cover the following topics:
 -   Setting OS and distribution variances
 -   Porting between Ansible versions
 
+#### Lab Environment
+
+All lab file are present at below path. Run following command in the terminal first before running commands in the lab:
+
+`cd ~/Desktop/ansible-course/Lab_7` 
+
 
 The preferred directory layout
 ==============================

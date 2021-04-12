@@ -19,6 +19,11 @@ In this lab, we will cover the following topics:
 -   Understanding your Ansible installation
 
 
+#### Lab Environment
+
+All lab file are present at below path. Run following command in the terminal first before running commands in the lab:
+
+`cd ~/Desktop/ansible-course/Lab_1` 
 
 
 Installing Ansible on Linux and FreeBSD

@@ -21,6 +21,12 @@ network, in this lab by covering the following topics:
 
 Let\'s get started!
 
+#### Lab Environment
+
+All lab file are present at below path. Run following command in the terminal first before running commands in the lab:
+
+`cd ~/Desktop/ansible-course/Lab_9` 
+
 
 Enabling network automation
 ---------------------------

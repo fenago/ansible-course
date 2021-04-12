@@ -3,14 +3,19 @@
 
 
 Lab 3. Defining Your Inventory
-=======================
+================================
+
 
 In this lab, we will cover the following topics:
 
 -   Creating an inventory file and adding hosts
--   Generating a dynamic inventory file
 -   Special host management using patterns
 
+#### Lab Environment
+
+All lab file are present at below path. Run following command in the terminal first before running commands in the lab:
+
+`cd ~/Desktop/ansible-course/Lab_3` 
 
 
 Creating an inventory file and adding hosts
@@ -50,7 +55,8 @@ power of static INI-formatted inventories.
 
 Now, if you wanted to create exactly the same inventory as the
 preceding, but this time, format it as YAML, you would specify it as
-follows:
+follows. Create an inventory file in [/etc/ansible/my_inventory.yaml] using the following yaml:
+
 
 ```
 ---
@@ -68,6 +74,13 @@ ungrouped:
 ```
 
 
+
+
+**Note:** You can copy file from lab_3 folder as well.
+
+```
+cd ~/Desktop/ansible-course/Lab_3 && cp my_inventory.yaml /etc/ansible/
+```
 
 Now if you were to run the preceding inventory within Ansible, using a
 simple [shell] command, the result would appear as follows:
@@ -194,6 +207,12 @@ all:
             frt02.example.com:
 ```
 
+
+**Note:** You can copy inventory file from lab_3 folder as well.
+
+```
+cd ~/Desktop/ansible-course/Lab_3 && cp hostgroups-yml /etc/ansible/my_inventory.yaml
+```
 
 When you want to work with any of the groups from the preceding
 inventory, you would simply reference it either in your playbook or on
@@ -347,6 +366,7 @@ is the same:
 
 ```
 $ ansible -i groupvars1-hostgroups-ini frontends -m debug -a "msg=\"Connecting to {{ lb_vip }}, listening on {{ https_port }}\""
+
 frt01.example.com | SUCCESS => {
     "msg": "Connecting to lb.example.com, listening on 8443"
 }
@@ -363,6 +383,7 @@ frt02.example.com | SUCCESS => {
     so if we need to change the connection port to [8444] on
     the [frt01.example.com] one, we could do this as follows:
 
+
 ```
 [frontends]
 frt01.example.com https_port=8444
@@ -378,6 +399,8 @@ see that we have overridden the variable on one host:
 
 ```
 $ ansible -i hostvars2-hostgroups-ini frontends -m debug -a "msg=\"Connecting to {{ lb_vip }}, listening on {{ https_port }}\""
+
+
 frt01.example.com | SUCCESS => {
     "msg": "Connecting to lb.example.com, listening on 8444"
 }
@@ -412,6 +435,7 @@ is the same as for our INI-formatted inventory:
 
 ```
 $ ansible -i hostvars2-hostgroups-yml frontends -m debug -a "msg=\"Connecting to {{ lb_vip }}, listening on {{ https_port }}\""
+
 frt01.example.com | SUCCESS => {
     "msg": "Connecting to lb.example.com, listening on 8444"
 }
@@ -499,7 +523,9 @@ $  tree
     happens:
 
 ```
+$ cd /root/Desktop/ansible-course/Lab_3/vartree
 $ ansible -i inventory frontends -m debug -a "msg=\"Connecting to {{ lb_vip }}, listening on {{ https_port }}\""
+
 frt02.example.com | SUCCESS => {
     "msg": "Connecting to lb.example.com, listening on 8443"
 }
@@ -536,27 +562,13 @@ group and the [frt01.example.com] host? Inside the
 and this can be incredibly useful for logically organizing variables in
 groups, especially as your playbooks get bigger and more complex.
 
-The files themselves are simply an adaptation of our previous ones:
 
-```
-$ cat host_vars/frt01.example.com/main.yml
----
-https_port: 8444
-
-$ cat group_vars/frontends/https_port.yml
----
-https_port: 8443
-
-$ cat group_vars/frontends/lb_vip.yml
----
-lb_vip: lb.example.com
-```
-
-Even with this more finely divided directory structure, the result of
+Even with more finely divided directory structure, the result of
 running the ad hoc command is still the same:
 
 ```
 $ ansible -i inventory frontends -m debug -a "msg=\"Connecting to {{ lb_vip }}, listening on {{ https_port }}\""
+
 frt01.example.com | SUCCESS => {
     "msg": "Connecting to lb.example.com, listening on 8444"
 }
@@ -609,7 +621,9 @@ Now, let\'s run an ad hoc command to see what value of [testvar]
 is actually set:
 
 ```
+$ cd /root/Desktop/ansible-course/Lab_3
 $ ansible -i hostgroups-children-vars-ini ubuntu -m debug -a "var=testvar"
+
 frt01.example.com | SUCCESS => {
     "testvar": "childgroup"
 }
@@ -619,268 +633,15 @@ frt02.example.com | SUCCESS => {
 ```
 
 It\'s important to note that the [frontends] group is a child of
-the [ubuntu] group in this inventory (hence, the group definition
-is [\[ubuntu:children\]]), and so the variable value we set at the
+the [ubuntu] group in this inventory and so the variable value we set at the
 [frontends] group level wins as this is the child group in this
 scenario.
 
-By now, you should have a pretty good idea of how to work with static
-inventory files. No look at Ansible\'s inventory capabilities is
-complete, however, without a look at dynamic inventories, and we shall
-do exactly this in the next section.
-
-
-Generating a dynamic inventory file 
-====================================
-
-
-This example will demonstrate for you the fundamentals of working with a
-dynamic inventory, which you can then take forward to use the dynamic
-inventory scripts for other systems. Let\'s get started with this
-process by first of all installing Cobbler---the process outlined here
-was tested on CentOS 7.8:
-
-1.  Your first task is to install the relevant Cobbler packages using
-    [apt]. Note that, at the time of writing, the SELinux policy
-    provided with CentOS 7 did not support Cobbler\'s functionality and
-    blocks some aspects from working. Although this is not something you
-    should do in a production environment, your simplest path to getting
-    this demo up and running is to simply disable SELinux:
-
-```
-$ apt install -y cobbler cobbler-web
-$ setenforce 0
-```
-
-2.  Next, ensure that the [cobblerd] service is configured to
-    listen on the loopback address by checking the settings in
-    [/etc/cobbler/settings]---the relevant snippet of the file is
-    shown here and should appear as follows:
-
-```
-# default, localhost
-server: 127.0.0.1  
-```
-
-
-This is not a public listening address, so please *do not use*
-[0.0.0.0]. You can also set it to the IP address of the Cobbler
-server.
-
-
-3.  With this step complete, you can start the [cobblerd] service
-    using [systemctl]:
-
-```
-$ systemctl start cobblerd.service
-$ systemctl enable cobblerd.service
-$ systemctl status cobblerd.service
-```
-
-4.  With the Cobbler service up and running, we\'ll now step through the
-    process of adding a distribution to Cobbler to create some hosts off
-    of. This process is fairly simple, but you do need to add a kernel
-    file and an initial RAM disk file. The easiest source to obtain
-    these from is your [/boot] directory, assuming you have
-    installed Cobbler on CentOS 7. On the test system used for this
-    demo, the following commands were used---however, you must replace
-    the version number in the [vmlinuz] and [initramfs]
-    filenames with the appropriate version numbers from your system\'s
-    [/boot] directory:
-
-```
-$ cobbler distro add --name=CentOS --kernel=/boot/vmlinuz-3.10.0-957.el7.x86_64 --initrd=/boot/initramfs-3.10.0-957.el7.x86_64.img
-
-$ cobbler profile add --name=webservers --distro=CentOS
-```
-
-This definition is quite rudimentary and would not necessarily be able
-to produce working server images; however, it will suffice for our
-simple demo as we can add some systems based on this notional
-CentOS-based image. Note that the profile name we are creating,
-[webservers], will later become our inventory group name in our
-dynamic inventory.
-
-5.  Let\'s now add those systems to Cobbler. The following two commands
-    will add two hosts called [frontend01] and [frontend02]
-    to our Cobbler system, using the [webservers] profile we
-    created previously: 
-
-```
-$ cobbler system add --name=frontend01 --profile=webservers --dns-name=frontend01.example.com --interface=eth0
-
-$ cobbler system add --name=frontend02 --profile=webservers --dns-name=frontend02.example.com --interface=eth0
-```
-
-Note that, for Ansible to work, it must be able to reach these FQDNs
-specified in the [\--dns-name] parameter. To achieve this, I am
-also adding entries to [/etc/hosts] on the Cobbler system for
-these two machines to ensure we can reach them later. These entries can
-point to any two systems of your choosing as this is just a test.
-
-At this point, you have successfully installed Cobbler, created a
-profile, and added two hypothetical systems to this profile. The next
-stage in our process is to download and configure the Ansible dynamic
-inventory scripts to work with these entries. To achieve this, let\'s
-get started on the process given here:
-
-1.  Download the Cobbler dynamic inventory file from the GitHub Ansible
-    repository and the associated configuration file template. Note that
-    most dynamic inventory scripts provided with Ansible also have a
-    templated configuration file, which will contain parameters that you
-    may need to set to get the dynamic inventory script working. For our
-    simple example, we will download these files into our current
-    working directory:
-
-```
-$ wget https://raw.githubusercontent.com/ansible/ansible/devel/contrib/inventory/cobbler.py
-$ wget https://raw.githubusercontent.com/ansible/ansible/devel/contrib/inventory/cobbler.ini
-$ chmod +x cobbler.py
-```
-
-It is important to remember to make whatever dynamic inventory script
-you download executable, as shown previously; if you don\'t do this,
-then Ansible won\'t be able to run the script even if everything else is
-set up perfectly.
-
-2.  Edit the [cobbler.ini] file and ensure that it points to the
-    localhost as, for this example, we are going to run Ansible and
-    Cobbler on the same system. In real life, you would point it at the
-    remote URL of your Cobbler system. A snippet of the configuration
-    file is shown here to give you an idea of what to configure:
-
-```
-[cobbler]
-
-# Specify IP address or Hostname of the cobbler server. The default variable is here:
-host = http://127.0.0.1/cobbler_api
-
-# (Optional) With caching, you will have responses of API call with the cobbler server quicker
-cache_path = /tmp
-cache_max_age = 900
-```
-
-3.  You can now run an Ansible ad hoc command in the manner you are used
-    to---the only difference this time is that you will specify the
-    filename of the dynamic inventory script rather than the name of the
-    static inventory file. Assuming you have set up hosts at the two
-    addresses we entered into Cobbler earlier, your output should look
-    something like that shown here:
-
-```
-$  ansible -i cobbler.py webservers -m ping
-frontend01.example.com | SUCCESS => {
-    "ansible_facts": {
-        "discovered_interpreter_python": "/usr/bin/python"
-    },
-    "changed": false,
-    "ping": "pong"
-}
-frontend02.example.com | SUCCESS => {
-    "ansible_facts": {
-        "discovered_interpreter_python": "/usr/bin/python"
-    },
-    "changed": false,
-    "ping": "pong"
-}
-```
-
-That\'s it! You have just implemented your first dynamic inventory in Ansible.
-
-
-Using multiple inventory sources in the inventory directories
--------------------------------------------------------------
-
-So far in this course, we have been specifying our inventory file (either
-static or dynamic) using the [-i] switch in our Ansible commands.
-What might not be apparent is that you can specify the [-i] switch
-more than once and so use multiple inventories at the same time. This
-enables you to perform tasks such as running a playbook (or ad hoc
-command) across hosts from both static and dynamic inventories at the
-same time. Ansible will work out what needs to be done---static
-inventories should not be marked as executable and so will not be
-processed as such, whereas dynamic inventories will be. This small but
-clever trick enables you to combine multiple inventory sources with
-ease. Let\'s move on in the next section to looking at the use of static
-inventory groups in combination with dynamic ones, an extension of this
-multiple-inventory functionality.
-
-
-
-Using static groups with dynamic groups
----------------------------------------
-
-Let\'s extend our Cobbler example from the preceding section by mixing a
-static inventory. Suppose that we want to make our [webservers]
-machines a child group of a group called [centos] so that we can,
-in the future, group all CentOS machines together. We know that we only
-have a Cobbler profile called [webservers], and ideally, we don\'t
-want to start messing with the Cobbler setup to do something solely
-Ansible-related.
-
-The answer to this is to create a static inventory file with two group
-definitions. The first must be the same name as the group you are
-expecting from the dynamic inventory, except that you should leave it
-blank. When Ansible combines the static and dynamic inventory contents,
-it will overlap the two groups and so add the hosts from Cobbler to
-these [webservers] groups.
-
-The second group definition should state that [webservers] is a
-child group of the [centos] group. The resulting file should look
-something like this:
-
-```
-[webservers]
-
-[centos:children]
-webservers
-```
-
-Now let\'s run a simple ad hoc [ping] command in Ansible to see
-how it evaluates the two inventories together. Notice how we will
-specify the [centos] group to run [ping] against, instead of
-the [webservers] group. We know that Cobbler has no [centos]
-group because we never created one, and we know that any hosts in this
-group must come via the [webservers] group when you combine the
-two inventories, as our static inventory has no hosts in it. The results
-will look something like this:
-
-```
-$ ansible -i static-groups-mix-ini -i cobbler.py centos -m ping
-frontend01.example.com | SUCCESS => {
-    "ansible_facts": {
-        "discovered_interpreter_python": "/usr/bin/python"
-    },
-    "changed": false,
-    "ping": "pong"
-}
-frontend02.example.com | SUCCESS => {
-    "ansible_facts": {
-        "discovered_interpreter_python": "/usr/bin/python"
-    },
-    "changed": false,
-    "ping": "pong"
-}
-```
-
-As you can see from the preceding output, we have referenced two
-different inventories, one static and the other dynamic. We have
-combined groups, taking hosts that only exist in one inventory source,
-and combining them with a group that only exists in another. As you can
-see, this is an incredibly simple example, and it would be easy to
-extend this to combine lists of static and dynamic hosts or to add a
-custom variable to a host that comes from a dynamic inventory.
 
 
 
 Special host management using patterns
 ======================================
-
-We have already established that you will often want to run either an ad
-hoc command or a playbook against only a subsection of your inventory.
-So far, we have been quite precise in doing that, but let\'s now expand
-upon this by looking at how Ansible can work with patterns to figure out
-which hosts a command (or playbook) should be run against.
 
 As a starting point, let\'s consider again an inventory that we defined
 earlier in this lab for the purposes of exploring host groups and
@@ -922,6 +683,7 @@ output concise and readable:
 
 ```
 $ ansible -i hostgroups-children-ini all --list-hosts
+
   hosts (7):
     loadbalancer.example.com
     frt01.example.com
@@ -938,6 +700,7 @@ properly:
 
 ```
 $ ansible -i hostgroups-children-ini '*' --list-hosts
+
   hosts (7):
     loadbalancer.example.com
     frt01.example.com
@@ -953,6 +716,7 @@ $ ansible -i hostgroups-children-ini '*' --list-hosts
 
 ```
 $ ansible -i hostgroups-children-ini frontends:apps --list-hosts
+
   hosts (4):
     frt01.example.com
     frt02.example.com
@@ -968,6 +732,7 @@ $ ansible -i hostgroups-children-ini frontends:apps --list-hosts
 
 ```
 $ ansible -i hostgroups-children-ini 'all:!apps' --list-hosts
+
   hosts (5):
     loadbalancer.example.com
     frt01.example.com
@@ -983,6 +748,7 @@ $ ansible -i hostgroups-children-ini 'all:!apps' --list-hosts
 
 ```
 $ ansible -i hostgroups-children-ini 'centos:&apps' --list-hosts
+
   hosts (2):
     app01.example.com
     app02.example.com
@@ -993,6 +759,7 @@ $ ansible -i hostgroups-children-ini 'centos:&apps' --list-hosts
 
 ```
 $ ansible -i hostgroups-children-ini 'db*.example.com' --list-hosts
+
   hosts (2):
     dbms02.example.com
     dbms01.example.com
@@ -1009,6 +776,7 @@ following:
 
 ```
 $ ansible-playbook -i hostgroups-children-ini site.yml --limit frontends:apps
+
 
 PLAY [A simple playbook for demonstrating inventory patterns] ******************
 
@@ -1046,11 +814,7 @@ In this lab, you learned about creating simple static inventory
 files and adding hosts to them. We then extended this by learning how to
 add host groups and assign variables to hosts. We also looked at how to
 organize your inventories and variables when a single flat inventory
-file becomes too much to handle. We then learned how to make use of
-dynamic inventory files, before concluding with a look at useful tips
-and tricks such as combining inventory sources and using patterns to
-specify hosts, all of which will make how you work with inventories
-easier and yet simultaneously more powerful.
+file becomes too much to handle.
 
 In the next lab, we will learn how to develop playbooks and roles to
 configure, deploy, and manage remote machines using Ansible.

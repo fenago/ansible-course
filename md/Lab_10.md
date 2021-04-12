@@ -21,6 +21,12 @@ There are a bunch of different ways to prevent or mitigate a bug in Ansible play
 -   Checking for bad syntax
 
 
+#### Lab Environment
+
+All lab file are present at below path. Run following command in the terminal first before running commands in the lab:
+
+`cd ~/Desktop/ansible-course/Lab_10` 
+
 
 
 Digging into playbook execution problems

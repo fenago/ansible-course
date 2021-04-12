@@ -5,7 +5,7 @@ PLAY [Handler demo 1] **********************************************************
 TASK [restart all services] ****************************************************
 changed: [frt01.example.com]
 
-RUNNING HANDLER [restart chronyd] **********************************************
+RUNNING HANDLER [restart ntp] **********************************************
 changed: [frt01.example.com]
 
 RUNNING HANDLER [restart apache] ***********************************************

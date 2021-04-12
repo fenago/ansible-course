@@ -5,9 +5,9 @@
   become: yes
 
   handlers:
-    - name: restart chronyd
+    - name: restart ntp
       service:
-        name: chronyd
+        name: ntp
         state: restarted
       listen: "restart all services"
     - name: restart apache

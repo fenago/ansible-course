@@ -14,6 +14,11 @@ In this lab, we will cover the following topics:
 -   Creating custom plugins
 
 
+#### Lab Environment
+
+All lab file are present at below path. Run following command in the terminal first before running commands in the lab:
+
+`cd ~/Desktop/ansible-course/Lab_6` 
 
 
 Discovering the plugin types

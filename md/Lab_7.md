@@ -466,7 +466,7 @@ sufficient if you just want to get started.
     7, you can do this as follows:
 
 ```
-$ sudo yum -y install python-boto python-boto3
+$ sudo apt -y install python-boto python-boto3
 ```
 
 Alternatively, you can use [pip] for this purpose. For example, to
@@ -944,7 +944,7 @@ on your Linux host. On CentOS, you would install these as follows:
 
 
 ```
-$ sudo yum install git
+$ sudo apt install git
 ```
 
 On Ubuntu, the process is similarly straightforward:
@@ -1064,38 +1064,6 @@ Setting OS and distribution variances
 =====================================
 
 
-As stated earlier, our goal is to try to use the same automation code as
-widely as possible. However, as much as we try to standardize our
-technology environments, variants always creep in. For example, it is
-impossible to simultaneously perform a major upgrade on all your servers
-in one go, so when a major new OS version comes out, such as **Red Hat
-Enterprise Linux** (**RHEL**) 8 or Ubuntu Server 20.04, it is inevitable
-that some machines will remain on older versions as others are upgraded.
-Similarly, an environment might be standardized on Ubuntu, but then an
-application is introduced that has only been certified to run on CentOS.
-In short, as important as standardization is, variances will always
-creep in.
-
-When writing Ansible playbooks, especially roles, your goal should be
-for them to be as widely applicable as possible throughout your
-environment. A classic example of this is package management---let\'s
-say you are writing a role to install the Apache 2 web server. If you
-have to support both Ubuntu and CentOS with this role, not only do you
-have different package managers to deal with ([yum]
-and [apt]), you also have different package names ([httpd]
-and [apache2]). 
-
-In Lab 4 we looked at how to apply conditions to tasks
-using the [when] clause, along with facts gathered by Ansible,
-such as [ansible\_distribution]. However, there is another way of
-running tasks on specific hosts that we haven\'t yet looked at. In the
-same lab, we also looked at the concept of defining multiple plays
-in one playbook---there is a special module that can create inventory
-groups for us based on Ansible facts and we can leverage this along with
-multiple plays to create a playbook that runs the appropriate tasks on
-each host based on its type. This is best explained by a practical
-example, so let\'s get started. 
-
 Assume that we are using the following simple inventory file for this
 example, which has two hosts in a single group called [app]:
 
@@ -1153,13 +1121,13 @@ are based on CentOS, they will be added to a group called
 
   tasks:
     - name: Install Apache on CentOS
-      yum:
-        name: httpd
+      apt:
+        name: apache2
         state: present
 ```
 
 This is a perfectly normal [Play] definition that uses the
-[yum] module to install the [httpd] package (as required on
+[apt] module to install the [apache2] package (as required on
 CentOS). The only thing that differentiates it from our earlier work is
 the [hosts] definition at the top of the play. This uses the newly
 created inventory group created by the [group\_by] module in the

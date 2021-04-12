@@ -1090,18 +1090,9 @@ of tags.
 Placing tags in the plays and tasks
 ===================================
 
-We have discussed, at many points in this course, that as your confidence
-and experience with Ansible grows, it is likely that your playbooks will
-grow in size, scale, and complexity. While this is undoubtedly a good
-thing, there may be times when you only want to run a subset of a
-playbook, rather than running it from beginning to end. We have
-discussed how to conditionally run tasks based on the value of a
-variable or fact, but is there a way we can run them on the basis of a
-selection made at the time that the playbook is run?
-
-Tags in Ansible plays are the solution to this, and in this section we
-will build a simple playbook with two tasks---each bearing a different
-tag---to show you how tags work. We will work with the two simple host
+In this section we
+will build a simple playbook with two --- each bearing a different
+tag to show you how tags work. We will work with the two simple host
 inventories that we worked with previously:
 
 1.  Create the following simple playbook to perform two tasks---one to
@@ -1115,7 +1106,7 @@ inventories that we worked with previously:
 
   tasks:
     - name: Install nginx
-      yum:
+      apt:
         name: nginx
         state: present
       tags:

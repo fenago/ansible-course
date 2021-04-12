@@ -294,7 +294,7 @@ hoc examples for you to consider:
     [frontends] group with the following command:
 
 ```
-$ ansible frontends -m copy -a "src=/etc/yum.conf dest=/tmp/yum.conf"
+$ ansible frontends -m copy -a "src=/etc/apt.conf dest=/tmp/apt.conf"
 ```
 
 -   Create a new directory on all hosts in the
@@ -312,12 +312,12 @@ $ ansible frontends -m file -a "dest=/path/user1/new mode=777 owner=user1 group=
 $ ansible frontends -m file -a "dest=/path/user1/new state=absent"
 ```
 
--   Install the [httpd] package with [yum] if it is not
+-   Install the [apache2] package with [apt] if it is not
     already present---if it is present, do not update it. Again, this
     applies to all hosts in the [frontends] inventory group:
 
 ```
-$ ansible frontends -m yum -a "name=httpd state=present"
+$ ansible frontends -m apt -a "name=apache2 state=present"
 ```
 
 -   The following command is similar to the previous one, except that
@@ -326,7 +326,7 @@ $ ansible frontends -m yum -a "name=httpd state=present"
     present, and update it to the latest version if it is present:
 
 ```
-$ ansible frontends -m yum -a "name=demo-tomcat-1 state=latest" 
+$ ansible frontends -m apt -a "name=demo-tomcat-1 state=latest" 
 ```
 
 -   Display all facts about all the hosts in your inventory

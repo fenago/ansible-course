@@ -1,13 +1,13 @@
 ---
-- name: Play to patch only CentOS systems
+- name: Play to patch only Ubuntu systems
   hosts: all
   become: true
 
   tasks: 
-  - name: Patch CentOS systems
-    yum:
-      name: httpd
+  - name: Patch Ubuntu systems
+    apt:
+      name: apache2
       state: latest
-    when: (ansible_facts['distribution'] == "CentOS" and ansible_facts['distribution_major_version'] == "6")
+    when: (ansible_facts['distribution'] == "Ubuntu" and ansible_facts['distribution_major_version'] == "20")
 
 

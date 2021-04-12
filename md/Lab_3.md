@@ -160,14 +160,6 @@ the top, [loadbalancer.example.com]---this host isn\'t in any
 group. All ungrouped hosts must go at the very top of an INI-formatted
 file. 
 
-Before we proceed any further, it\'s worth noting that inventories can
-also contain groups of groups, which is incredibly useful for processing
-certain tasks by a different division. The preceding inventory stands in
-its own right, but what if our frontend servers are built on Ubuntu, and
-the app and database servers are built on CentOS? There will be some
-fundamental differences in the ways we handle these hosts---for example,
-we might use the [apt] module to manage packages on Ubuntu and the
-[yum] module on CentOS.
 
 We could, of course, handle this case using facts gathered from each
 host as these will contain the operating system details. We could also
@@ -230,12 +222,6 @@ all:
             frt02.example.com:
 ```
 
-You can see that the [children] keyword is still used in the
-YAML-formatted inventory, but now the structure is more hierarchical
-than it was in the INI format. The indentation might be easier for you
-to follow, but note how the hosts are ultimately defined at quite a high
-level of indentation---this format could be more difficult to extend
-depending on your desired approach.
 
 When you want to work with any of the groups from the preceding
 inventory, you would simply reference it either in your playbook or on
@@ -326,14 +312,6 @@ variables.
 Adding host and group variables to your inventory
 -------------------------------------------------
 
-We have already touched upon host variables---we saw them earlier in
-this lab when we used them to override connection details such as
-the user account to connect with, the address to connect to, and the
-port to use. However, there is so much more you can do with Ansible and
-inventory variables, and it is important to note that they can be
-defined not only at the host level but also at the group level, which
-again provides you with some incredibly powerful ways in which to
-efficiently manage your infrastructure from one central inventory.
 
 Let\'s build on our previous three-tier example and suppose that we need
 to set two variables for each of our two frontend servers. These are not
@@ -690,34 +668,6 @@ do exactly this in the next section.
 Generating a dynamic inventory file 
 ====================================
 
-In these days of cloud computing and infrastructure-as-code, the hosts
-you may wish to automate could change on a daily if not hourly basis!
-Keeping a static Ansible inventory up to date could become a full-time
-job, and hence, in many large-scale scenarios, it becomes unrealistic to
-attempt to use a static inventory on an ongoing basis.
-
-This is where Ansible\'s dynamic inventory support comes in. In short,
-Ansible can gather its inventory data from just about any executable
-file (though you will find that most dynamic inventories are written in
-Python)---the only requirement is that the executable returns the
-inventory data in a specified JSON format. You are free to create your
-own inventory scripts if you wish, but thankfully, many have been
-created already for you to use that cover a multitude of potential
-inventory sources including Amazon EC2, Microsoft Azure, Red Hat
-Satellite, LDAP directories, and many more systems. 
-
-When writing a course, it is difficult to know for certain which dynamic
-inventory script to use as an example as it is not a given that everyone
-will have an Amazon EC2 account they can freely use to test against (for
-example). As a result, we will use the Cobbler provisioning system by
-way of example, as this is freely available and easy to roll out on a
-CentOS system. For those interested, Cobbler is a system for dynamically
-provisioning and building Linux systems, and it can handle all aspects
-of this including DNS, DHCP, PXE booting, and so on. Hence, if you were
-to use this to provision virtual or physical machines in your
-infrastructure, it would make sense to also use this as your inventory
-source as Cobbler was responsible for building the systems in the first
-place, and so knows all of the system names.
 
 This example will demonstrate for you the fundamentals of working with a
 dynamic inventory, which you can then take forward to use the dynamic
@@ -726,14 +676,14 @@ process by first of all installing Cobbler---the process outlined here
 was tested on CentOS 7.8:
 
 1.  Your first task is to install the relevant Cobbler packages using
-    [yum]. Note that, at the time of writing, the SELinux policy
+    [apt]. Note that, at the time of writing, the SELinux policy
     provided with CentOS 7 did not support Cobbler\'s functionality and
     blocks some aspects from working. Although this is not something you
     should do in a production environment, your simplest path to getting
     this demo up and running is to simply disable SELinux:
 
 ```
-$ yum install -y cobbler cobbler-web
+$ apt install -y cobbler cobbler-web
 $ setenforce 0
 ```
 
@@ -1189,7 +1139,7 @@ E\) [\[frontends:vars\]]
 
 A) Playbook
 
-B\) Yum
+B\) apt
 
 C\) Cobbler
 

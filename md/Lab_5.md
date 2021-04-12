@@ -465,7 +465,7 @@ $ sudo dnf install python python-devel
     the required packages:\
 
 ```
-$ sudo yum install python python-devel
+$ sudo apt install python python-devel
 ```
 
 -   On Ubuntu, you would run the following commands to install the

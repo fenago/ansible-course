@@ -13,8 +13,8 @@
 
   tasks:
     - name: Install Apache on CentOS
-      yum:
-        name: httpd
+      apt:
+        name: apache2
         state: present
 
 - name: Play to install Apache on Ubuntu

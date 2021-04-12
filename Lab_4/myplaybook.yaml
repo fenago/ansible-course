@@ -1,11 +1,11 @@
 ---
 - hosts: frontends
-  remote_user: fenago
+  remote_user: root
 
   tasks:
   - name: simple connection test
     ping:
-    remote_user: fenago
+    remote_user: root
 
   - name: run a simple command
     shell: /bin/ls -al /nonexistent

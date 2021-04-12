@@ -75,12 +75,12 @@ Let\'s dive right in and get started writing a playbook.
 ```
 ---
 - hosts: frontends
-  remote_user: fenago
+  remote_user: root
 
   tasks:
   - name: simple connection test
     ping:
-    remote_user: fenago
+    remote_user: root
 ```
 
 2.  Add another task below the first to run the [shell] module
@@ -172,13 +172,13 @@ Consider the following playbook:
     - name: Update Apache configuration
       template:
         src: template.j2
-        dest: /etc/httpd/httpd.conf
+        dest: /etc/apache2/apache2.conf
       notify: Restart Apache
 
   handlers:
     - name: Restart Apache
       service:
-        name: httpd
+        name: apache2
         state: restarted
 ```
 
@@ -245,7 +245,7 @@ following example:
       listen: "restart all services"
     - name: restart apache
       service:
-        name: httpd
+        name: apache2
         state: restarted
       listen: "restart all services"
 
@@ -317,13 +317,12 @@ ensure the service is running (and runs at boot time).
 To perform these commands in the shell, you might do the following:
 
 ```
-$ sudo yum install httpd
-$ sudo firewall-cmd --add-service=http --permanent 
-$ sudo firewall-cmd --add-service=https --permanent
-$ sudo firewall-cmd --reload
-$ sudo systemctl enable httpd.service
-$ sudo systemctl restart httpd.service
+$ sudo apt install apache2
+$ sudo service apache2 start
+$ sudo service apache2 status
 ```
+
+**Note:** Start will because port 80 is alredy in use by lab environment.
 
 Now, for each of these commands, there is an equivalent ad hoc Ansible
 command that you could run. We won\'t go through all of them here in the
@@ -332,7 +331,7 @@ service---in this case, you could run an ad hoc command similar to the
 following (again, we will perform it only on one host for conciseness):
 
 ```
-$ ansible -i hosts frt01* -m service -a "name=httpd state=restarted"
+$ ansible -i hosts frt01* -m service -a "name=apache2 state=restarted"
 ```
 
 When run successfully, you will see pages of shell output containing all
@@ -348,7 +347,7 @@ frt01.example.com | CHANGED => {
         "discovered_interpreter_python": "/usr/bin/python"
     },
     "changed": true,
-    "name": "httpd",
+    "name": "apache2",
     "state": "started",
 ```
 
@@ -376,8 +375,8 @@ multiple ways to do this, but consider the following as an example:
 
   tasks:
     - name: Install Apache package
-      yum:
-        name: httpd
+      apt:
+        name: apache2
         state: latest
     - name: Open firewall for Apache
       firewalld:
@@ -390,7 +389,7 @@ multiple ways to do this, but consider the following as an example:
         - "https"
     - name: Restart and enable the service
       service:
-        name: httpd
+        name: apache2
         state: restarted
         enabled: yes
 ```
@@ -468,12 +467,12 @@ started with building up our playbook:
 
   tasks:
   - name: Install the Apache package
-    yum:
-      name: httpd
+    apt:
+      name: apache2
       state: latest
   - name: Start the Apache server
     service:
-      name: httpd
+      name: apache2
       state: started
 ```
 
@@ -487,7 +486,7 @@ started with building up our playbook:
 
   tasks:
   - name: Install Tomcat
-    yum:
+    apt:
       name: tomcat
       state: latest
   - name: Start the Tomcat server
@@ -712,18 +711,18 @@ $ mkdir -p roles/installapache/tasks
 
 2.  Create [centos.yml] in [roles/installapache/tasks] to
     install the latest version of the Apache web server via the
-    [yum] package manager. This should contain the following
+    [apt] package manager. This should contain the following
     content:
 
 ```
 ---
-- name: Install Apache using yum
-  yum:
-    name: "httpd"
+- name: Install Apache using apt
+  apt:
+    name: "apache2"
     state: latest
 - name: Start the Apache server
   service:
-    name: httpd
+    name: apache2
     state: started
 ```
 
@@ -797,7 +796,7 @@ TASK [Gathering Facts] *********************************************************
 ok: [frt01.example.com]
 ok: [frt02.example.com]
 
-TASK [installapache : Install Apache using yum] ********************************
+TASK [installapache : Install Apache using apt] ********************************
 changed: [frt02.example.com]
 changed: [frt01.example.com]
 
@@ -848,43 +847,6 @@ similar manner as in the preceding example:
       name: approle
 ```
 
-These features were not available in versions of Ansible earlier than
-2.3, and their usage changed slightly in version 2.4 for consistency
-with the way that some other Ansible features work. We will not worry
-about the details of this here as Ansible is now on release 2.9, so
-unless you absolutely have to run a much earlier version of Ansible, it
-is sufficient to assume that these two statements work as we shall
-outline in the following.
-
-Fundamentally, the [import\_role] statement performs a static
-import of the role you specify at the time when all playbook code is
-parsed. Hence, roles brought into your playbook using the
-[import\_role] statement are treated just as any other code in a
-play or role is when Ansible begins parsing. Using [import\_role]
-is basically the same as declaring your roles after the [roles:]
-statement in [site.yml], just as we did in the preceding example.
-
-[include\_role] is subtly but fundamentally different in that the
-role you specify is not evaluated when the playbook is parsed
-initially---rather, it is processed dynamically during the playbook run,
-at the point at which [include\_role] is encountered.
-
-Probably the most fundamental reason to choose between the
-[include] or [import] statements given in the preceding is
-looping---if you need to run a role within a loop, you cannot do so with
-[import\_role] and so must use [include\_role]. There are,
-however, both benefits and limitations to both, and you will need to
-choose the most appropriate one for your scenario---the official Ansible
-documentation
-(<https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse.html#dynamic-vs-static>)
-will help you to make the right decision. 
-
-As we have seen in this section, roles are incredibly simple to get
-started with and yet offer an incredibly powerful way in which to
-organize and reuse your Ansible code. In the next section, we will
-expand upon our simple task-based example by looking at adding
-role-specific variables and dependencies into your code.
-
 
 
 Setting up role-based variables and dependencies
@@ -902,36 +864,6 @@ Roles based variables can go in one of two locations:
 -   [defaults/main.yml]
 -   [vars/main.yml]
 
-The difference between these two locations is their position in
-Ansible\'s variable order of precedence
-(<https://docs.ansible.com/ansible/latest/user_guide/playbooks_variables.html#variable-precedence-where-should-i-put-a-variable>).
-Variables that go in the [defaults/] directory are one of the
-lowest in terms of precedence and so are easily overwritten. This
-location is where you would put variables that you want to override
-easily, but where you don\'t want to leave a variable undefined. For
-example, if you are installing Apache Tomcat, you might build a role to
-install a specific version. However, you don\'t want the role to exit
-with an error if someone forgets to set the version---rather, you would
-prefer to set a sensible default such as [7.0.76], which can then
-be overridden with inventory variables or on the command line (using the
-[-e] or [\--extra-vars] switches). In this way, you know the
-role will work even without someone explicitly setting this variable,
-but it can easily be changed to a newer Tomcat version if desired.
-
-Variables that go in the [vars/] directory, however, come much
-higher up on Ansible\'s variable precedence ordering. This will not be
-overridden by inventory variables, and so should be used for variable
-data that it is more important to keep static. Of course, this is not to
-say they can\'t be
-overridden---the [-e] or [\--extra-vars] switches are the
-highest order of precedence in Ansible and so will override anything
-else that you define. 
-
-Most of the time, you will probably make use of the [defaults/]
-based variables alone, but there will doubtless be times when having the
-option of variables higher up the precedence ordering becomes valuable
-to your automation, and so it is vital to know that this option is
-available to you. 
 
 In addition to the role-based variables described previously, there is
 also the option to add metadata to a role using the [meta/]
@@ -1311,14 +1243,6 @@ roles/testrole/
     └── main.yml 
 ```
 
-That should give you enough information to get started on your journey
-into Ansible roles. I cannot stress highly enough how important it is to
-develop your code as roles---it might not seem important initially, but
-as your automation use cases expand, and your requirement to reuse code
-grows, you will be glad that you did. In the next section, let\'s expand
-our look at Ansible playbooks with a discussion of the ways in which
-conditional logic can be used in your Ansible code.
-
 
 Using conditions in your code
 =============================
@@ -1359,16 +1283,8 @@ health_check_retry=3
 health_check_interal=60
 ```
 
-Suppose that you want to perform an Ansible task only on certain
-operating systems. We have already discussed Ansible facts, and these
-provide the perfect platform to start exploring conditional logic in
-your playbooks. Consider this: an urgent patch has been released for all
-of your CentOS systems, and you want to apply it immediately. You could,
-of course, go through and create a special inventory (or host group) for
-CentOS hosts, but this is additional work that you don\'t necessarily
-need to do.
 
-Instead, let\'s define the task that will perform our update but add a
+Let\'s define the task that will perform our update but add a
 [when] clause containing a Jinja 2 expressions to it in a simple
 example playbook:
 
@@ -1379,14 +1295,14 @@ example playbook:
   become: true
 
   tasks:
-  - name: Patch CentOS systems
-    yum:
-      name: httpd
+  - name: Patch Ubuntu systems
+    apt:
+      name: apache2
       state: latest
-    when: ansible_facts['distribution'] == "CentOS"
+    when: ansible_facts['distribution'] == "Ubuntu"
 ```
 
-Now, when we run this task, if your test system(s) are CentOS-based (and
+Now, when we run this task, if your test system(s) are Ubuntu-based (and
 mine are), you should see output similar to the following:
 
 ```
@@ -1400,7 +1316,7 @@ ok: [app01.example.com]
 ok: [frt01.example.com]
 ok: [app02.example.com]
 
-TASK [Patch CentOS systems] ****************************************************
+TASK [Patch Ubuntu systems] ****************************************************
 ok: [app01.example.com]
 changed: [frt01.example.com]
 ok: [app02.example.com]
@@ -1413,25 +1329,25 @@ frt01.example.com : ok=2 changed=1 unreachable=0 failed=0 skipped=0 rescued=0 ig
 frt02.example.com : ok=2 changed=0 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0
 ```
 
-The preceding output shows that all of our systems were CentOS-based,
+The preceding output shows that all of our systems were Ubuntu-based,
 but that only [frt01.example.com] needed the patch applying. Now
 we can make our logic more precise---perhaps it is only our legacy
-systems that are running on CentOS 6 that need the patch applying. In
+systems that need the patch applying. In
 this case, we can expand the logic in our playbook to check both the
 distribution and major version, as follows:
 
 ```
 ---
-- name: Play to patch only CentOS systems
+- name: Play to patch only Ubuntu systems
   hosts: all
   become: true
 
   tasks:
-  - name: Patch CentOS systems
-    yum:
-      name: httpd
+  - name: Patch Ubuntu systems
+    apt:
+      name: apache2
       state: latest
-    when: (ansible_facts['distribution'] == "CentOS" and ansible_facts['distribution_major_version'] == "6")
+    when: (ansible_facts['distribution'] == "Ubuntu" and ansible_facts['distribution_major_version'] == "20")
 ```
 
 Now, if we run our modified playbook, depending on the systems you have
@@ -1443,7 +1359,7 @@ not match my logical expression:
 ```
 $ ansible-playbook -i hosts condition2.yml
 
-PLAY [Play to patch only CentOS systems] ***************************************
+PLAY [Play to patch only Ubuntu systems] ***************************************
 
 TASK [Gathering Facts] *********************************************************
 ok: [frt01.example.com]
@@ -1451,7 +1367,7 @@ ok: [app02.example.com]
 ok: [app01.example.com]
 ok: [frt02.example.com]
 
-TASK [Patch CentOS systems] ****************************************************
+TASK [Patch Ubuntu systems] ****************************************************
 changed: [app01.example.com]
 skipping: [frt01.example.com]
 skipping: [frt02.example.com]
@@ -1467,7 +1383,7 @@ frt02.example.com : ok=1 changed=0 unreachable=0 failed=0 skipped=1 rescued=0 ig
 Of course, this conditional logic is not limited to Ansible facts and
 can be incredibly valuable when using the [shell] or
 [command] modules. When you run any Ansible module (be it
-[shell], [command], [yum], [copy], or
+[shell], [command], [apt], [copy], or
 otherwise), the module returns data detailing the results of its run.
 You can capture this in a standard Ansible variable using the
 [register] keyword and then process it further later on in the
@@ -1980,15 +1896,15 @@ indentation required to denote their presence in the block):
     block:
       - name: Install the Apache package
         dnf:
-          name: httpd
+          name: apache2
           state: installed
       - name: Install the templated configuration to a dummy location
         template:
           src: templates/src.j2
           dest: /tmp/my.conf
-      - name: Start the httpd service
+      - name: Start the apache2 service
         service:
-          name: httpd
+          name: apache2
           state: started
           enabled: True
     when: ansible_facts['distribution'] == 'Fedora'
@@ -2023,7 +1939,7 @@ changed: [frt02.example.com]
 skipping: [app01.example.com]
 skipping: [app02.example.com]
 
-TASK [Start the httpd service] *************************************************
+TASK [Start the apache2 service] *************************************************
 changed: [frt01.example.com]
 changed: [frt02.example.com]
 skipping: [app01.example.com]
@@ -2458,18 +2374,18 @@ Questions
 1.  How do you restart the Apache web server in the [frontends]
     host group via an ad hoc command?
 
-A\) [ansible frontends -i hosts -a \"name=httpd state=restarted\"]
+A\) [ansible frontends -i hosts -a \"name=apache2 state=restarted\"]
 
-B\) [ansible frontends -i hosts -b service -a \"name=httpd
+B\) [ansible frontends -i hosts -b service -a \"name=apache2
 state=restarted\"]
 
-C\) [ansible frontends -i hosts -b -m service -a \"name=httpd
+C\) [ansible frontends -i hosts -b -m service -a \"name=apache2
 state=restarted\"]
 
-D\) [ansible frontends -i hosts -b -m server -a \"name=httpd
+D\) [ansible frontends -i hosts -b -m server -a \"name=apache2
 state=restarted\"]
 
-E\) [ansible frontends -i hosts -m restart -a \"name=httpd\"]
+E\) [ansible frontends -i hosts -m restart -a \"name=apache2\"]
 
 2.  Do blocks allow you to logically make a group of tasks, or perform
     error handling?

@@ -8,15 +8,15 @@
     block:
       - name: Install the Apache package
         dnf:
-          name: httpd
+          name: apache2
           state: installed
       - name: Install the templated configuration to a dummy location
         template:
           src: templates/src.j2
           dest: /tmp/my.conf
-      - name: Start the httpd service
+      - name: Start the apache2 service
         service:
-          name: httpd
+          name: apache2
           state: started
           enabled: True
     when: ansible_facts['distribution'] == 'Fedora'

@@ -12,7 +12,7 @@
       listen: "restart all services"
     - name: restart apache
       service:
-        name: httpd
+        name: apache2
         state: restarted
       listen: "restart all services"
 

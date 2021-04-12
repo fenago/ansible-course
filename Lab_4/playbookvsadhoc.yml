@@ -5,7 +5,7 @@
   handlers:
   - name: restart apache web server
     service:
-      name: httpd
+      name: apache2
       state: restarted
     listen: "restart all services"
 

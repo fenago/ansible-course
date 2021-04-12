@@ -7,13 +7,6 @@ Lab 2. Understanding the Fundamentals of Ansible
 =========================================
 
 
-In this lab, you will learn more about the composition of the
-Ansible framework and its various components, as well as how to use them
-together in playbooks written in YAML syntax. So, you will learn how to
-create automation code for your IT operations tasks and learn how to
-apply this using both ad hoc tasks and more complex playbooks. Finally,
-you will learn how Jinja2 templating allows you to repeatably build
-dynamic configuration files using variables and dynamic expressions.
 
 In this lab, we will cover the following topics:
 
@@ -28,11 +21,6 @@ In this lab, we will cover the following topics:
 Getting familiar with the Ansible framework
 ===========================================
 
-In this section, you will understand how the Ansible framework fits into
-IT operations automation. We will explain how to start Ansible for the
-first time. Once you understand this framework, you will be ready
-to start learning more advanced concepts, such as creating and running
-playbooks with your own inventory.
 
 In order to run Ansible\'s ad hoc commands via an SSH connection from
 your Ansible control machine to multiple remote hosts, you need to
@@ -56,7 +44,7 @@ Ansible will make use of SSH during all remote Linux-based automation
 tasks:
 
 ```
-$ ssh <username>@frontend.example.com
+$ ssh root@frontend.example.com
 The authenticity of host 'frontend.example.com (192.168.1.52)' can't be established.
 ED25519 key fingerprint is SHA256:hU+saFERGFDERW453tasdFPAkpVws.
 Are you sure you want to continue connecting (yes/no)? yes
@@ -93,15 +81,13 @@ example:
 
 ```
 $ ping frontend.example.com
-PING frontend.example.com (192.168.1.52): 56 data bytes
-64 bytes from 192.168.1.52: icmp_seq=0 ttl=64 time=0.040 ms
-64 bytes from 192.168.1.52: icmp_seq=1 ttl=64 time=0.115 ms
-64 bytes from 192.168.1.52: icmp_seq=2 ttl=64 time=0.097 ms
-64 bytes from 192.168.1.52: icmp_seq=3 ttl=64 time=0.130 ms 
+
+PING frontend.example.com (127.0.0.1) 56(84) bytes of data.
+64 bytes from localhost (127.0.0.1): icmp_seq=1 ttl=64 time=0.022 ms
+64 bytes from localhost (127.0.0.1): icmp_seq=2 ttl=64 time=0.018 ms
+64 bytes from localhost (127.0.0.1): icmp_seq=3 ttl=64 time=0.045 ms
+64 bytes from localhost (127.0.0.1): icmp_seq=4 ttl=64 time=0.033 ms
 ```
-
-
-
 
 
 2.  To make the automation process seamless, we\'ll generate an SSH
@@ -200,9 +186,6 @@ backend2.example.com | SUCCESS => {
 
 
 
-
-
-
 This example output is generated with Ansible\'s default level of
 verbosity. If you run into problems during this process, you can
 increase Ansible\'s level of verbosity by passing one or more [-v]
@@ -217,33 +200,13 @@ error similar to the following:
 backend2.example.com | FAILED => SSH encountered an unknown error during the connection. We recommend you re-run the command using -vvvv, which will enable SSH debugging output to help diagnose the issue
 ```
 
-Note that even Ansible recommends the use of the [-vvvv] switch
-for debugging. This could potentially produce pages of output but will
-include many useful details, such as the raw SSH command that was used
-to generate the connection to the target host in the inventory, along
-with any error messages that may have resulted from that call. This can
-be incredibly useful when debugging connectivity or code issues,
-although the output might be a little overwhelming at first. However,
-with some practice, you will quickly learn to interpret it.
 
-By now, you should have a good idea of how Ansible communicates with its
-clients over SSH. Let\'s proceed to the next section, where we will look
-in more detail at the various components that make up Ansible, as this
-will help us understand how to work with it better.
-
-
+`ansible all -m ping -vvvv`
 
 
 Breaking down the Ansible components
 ------------------------------------
 
-Ansible allows you to define policies, configurations, task sequences,
-and orchestration steps in playbooks---the limit is really only your
-imagination. A playbook can be executed to manage your tasks either
-synchronously or asynchronously on a remote machine, although you will
-find that most examples are synchronous. In this section, you will learn
-about the main components of Ansible and understand how Ansible employs
-those components to communicate with remote hosts.
 
 In order to understand the various components, we first need an
 inventory to work from. Let\'s create an example one, ideally with
@@ -295,7 +258,7 @@ first example playbook:
 3.  After this header, we will specify a task block that will contain
     one or more tasks to be run in sequence. For now, we will simply
     create one task to update the version of Apache using the
-    [yum] module (because of this, this playbook is only suitable
+    [apt] module (because of this, this playbook is only suitable
     for running against RHEL-, CentOS-, or Fedora-based hosts). We will
     also specify a special element of the play called a handler.
     Simply put, a handler is a special type of task that is called only
@@ -330,6 +293,10 @@ look something as follows:
 
 
 ```
+$ cd ~/Desktop/ansible-course/Lab_2
+$ ansible-playbook update-apache-version.yml
+
+
 $ PLAY [My first Ansible playbook] ***********************************************
 
 TASK [Gathering Facts] *********************************************************
@@ -353,26 +320,7 @@ remote2.example.com : ok=3 changed=2 unreachable=0 failed=0 skipped=0 rescued=0 
 remote3.example.com : ok=3 changed=2 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0
 ```
 
-If you examine the output from the playbook, you can see the value in
-naming not only the play but also each task that is executed, as it
-makes interpreting the output of the run a very simple task. You will
-also see that there are multiple possible results from running a task;
-in the preceding example, we can see two of these results---[ok]
-and [changed]. Most of these results are fairly self-explanatory,
-with [ok] meaning the task ran successfully and that nothing
-changed as a result of the run. An example of this in the preceding
-playbook is the [Gathering Facts] stage, which is a read-only task
-that gathers information about the target hosts. As a result, it can
-only ever return [ok] or a failed status, such as
-[unreachable], if the host is down. It should never return
-[changed].
-
-However, you can see in the preceding output that all three hosts need
-to upgrade their Apache package and, as a result of this, the results
-from the [Update the latest of an Apache Web Server] task is
-[changed] for all the hosts. This [changed] result means
-that our [handler] variable is notified and the web server service
-is restarted.
+<span style="color:red;">Since we have added all above hosts in `/etc/hosts` with `127.0.0.1` address so they are pointing to same machine, we will get locking error which can be ignored. This error won't occur using multiple machines</span>
 
 If we run the playbook a second time, we know that it is very unlikely
 that the Apache package will need upgrading again. Notice how the
@@ -410,13 +358,6 @@ should unnecessary alterations to files. In short, Ansible playbooks are
 (and should be) designed to be efficient and to achieve a target machine
 state.
 
-This has very much been a crash course on writing your first playbook,
-but hopefully, it gives you a taste of what Ansible can do when you move
-from single ad hoc commands through to more complex playbooks. Before we
-explore the Ansible language and components any further, let\'s take a
-more in-depth look at the YAML language that playbooks are written in.
-
-
 
 Learning the YAML syntax
 ------------------------
@@ -430,22 +371,6 @@ enforced indentation in the code ensures that it is tidy and easy on the
 eye. In addition, there are libraries available in most programming
 languages for working with YAML.
 
-This reflects one of the core goals of Ansible---to produce easy-to-read
-(and write) code that described the target state of a given host.
-Ansible playbooks are (ideally) supposed to be self-documenting, as
-documentation is often an afterthought in busy technology
-environments---so, what better way to document than through the
-automation system responsible for deploying code?
-
-Before we dive into YAML structure, a word on the files themselves.
-Files written in YAML can optionally begin with [\-\--] (as seen
-in the example playbook in the previous section) and end with
-[\...]. This applies to all files in YAML, regardless of whether
-it is employed by Ansible or another system, and indicates that the file
-is in the YAML language. You will find that most examples of Ansible
-playbooks (as well as roles and other associated YAML files) start with
-[\-\--] but do not end with [\...]---the header is
-sufficient to clearly denote that the file uses the YAML format.
 
 Let\'s explore the YAML language through the example playbook we created
 in the preceding section:
@@ -454,14 +379,14 @@ in the preceding section:
     although it might not be obvious, the [tasks:] block of the
     playbook is actually a YAML list. A list in YAML lists all of its
     items at the same indentation level, with each line starting
-    with [-]. For example, we updated the [httpd] package
+    with [-]. For example, we updated the [apache2] package
     from the preceding playbook using the following code:
 
 
 ```
   - name: Update the latest of an Apache Web Server
-    yum:
-      name: httpd
+    apt:
+      name: apache2
       state: latest
 ```
 
@@ -470,9 +395,9 @@ follows:
 
 ```
   - name: Update the latest of an Apache Web Server
-    yum:
+    apt:
       name:
-        - httpd
+        - apache2
         - mod_ssl
       state: latest
 ```
@@ -490,7 +415,7 @@ updated.
 
 ```
     service:
-      name: httpd
+      name: apache2
       state: restarted
 ```
 
@@ -500,7 +425,7 @@ keys are indented with two more spaces than the [service] key.
 This higher level of indentation means that the [name] and
 [state] keys are associated with the [service] key,
 therefore, in this case, telling the [service] module which
-service to operate on ([httpd]) and what to do with it (restart
+service to operate on ([apache2]) and what to do with it (restart
 it).
 
 Already, we have observed in these two examples that you can produce
@@ -726,7 +651,7 @@ playbooks:
 ```
 ---
 - hosts: frontends_na_zone
-  remote_user: fenago
+  remote_user: root
   tasks:
     - name: simple connection test
       ping:
@@ -770,7 +695,7 @@ frontend2-na.example.com : ok=2 changed=0 unreachable=0 failed=0 skipped=0 rescu
 ```
 ---
 - hosts: appservers_emea_zone
-  remote_user: fenago
+  remote_user: root
   tasks:
     - name: simple connection test
       ping:
@@ -884,7 +809,7 @@ the others are ignored, even if they are present:
 4.  [/etc/ansible/ansible.cfg]: The central configuration that we
     previously mentioned
 
-If you installed Ansible through a package manager, such as [yum]
+If you installed Ansible through a package manager, such as [apt]
 or [apt], you will almost always find a default configuration file
 called [ansible.cfg] in [/etc/ansible]. However, if you
 built Ansible from the source or installed it via [pip], the
@@ -1102,47 +1027,6 @@ Let\'s try this out now:
 $ ansible --help
 ```
 
-You will see a great deal of helpful output when you run the preceding
-command; an example of this is shown in the following code block (you
-might want to pipe this into a pager, such as [less], so that you
-can read it all easily):
-
-```
-$ ansible --help
-usage: ansible [-h] [--version] [-v] [-b] [--become-method BECOME_METHOD] [--become-user BECOME_USER] [-K] [-i INVENTORY] [--list-hosts] [-l SUBSET] [-P POLL_INTERVAL] [-B SECONDS] [-o] [-t TREE] [-k]
-               [--private-key PRIVATE_KEY_FILE] [-u REMOTE_USER] [-c CONNECTION] [-T TIMEOUT] [--ssh-common-args SSH_COMMON_ARGS] [--sftp-extra-args SFTP_EXTRA_ARGS] [--scp-extra-args SCP_EXTRA_ARGS]
-               [--ssh-extra-args SSH_EXTRA_ARGS] [-C] [--syntax-check] [-D] [-e EXTRA_VARS] [--vault-id VAULT_IDS] [--ask-vault-pass | --vault-password-file VAULT_PASSWORD_FILES] [-f FORKS]
-               [-M MODULE_PATH] [--playbook-dir BASEDIR] [-a MODULE_ARGS] [-m MODULE_NAME]
-               pattern
-
-Define and run a single task 'playbook' against a set of hosts
-
-positional arguments:
-  pattern host pattern
-
-optional arguments:
-  --ask-vault-pass ask for vault password
-  --list-hosts outputs a list of matching hosts; does not execute anything else
-  --playbook-dir BASEDIR
-                        Since this tool does not use playbooks, use this as a substitute playbook directory.This sets the relative path for many features including roles/ group_vars/ etc.
-  --syntax-check perform a syntax check on the playbook, but do not execute it
-  --vault-id VAULT_IDS the vault identity to use
-  --vault-password-file VAULT_PASSWORD_FILES
-                        vault password file
-  --version show program's version number, config file location, configured module search path, module location, executable location and exit
-  -B SECONDS, --background SECONDS
-                        run asynchronously, failing after X seconds (default=N/A)
-  -C, --check don't make any changes; instead, try to predict some of the changes that may occur
-  -D, --diff when changing (small) files and templates, show the differences in those files; works great with --check
-  -M MODULE_PATH, --module-path MODULE_PATH
-                        prepend colon-separated path(s) to module library (default=~/.ansible/plugins/modules:/usr/share/ansible/plugins/modules)
-  -P POLL_INTERVAL, --poll POLL_INTERVAL
-                        set the poll interval if using -B (default=15)
-  -a MODULE_ARGS, --args MODULE_ARGS
-                        module arguments
-  -e EXTRA_VARS, --extra-vars EXTRA_VARS
-                        set additional variables as key=value or YAML/JSON, if filename prepend with @
-```
 
 2.  We could take one example from the preceding code to build on our
     previous use of [ansible]; so far, we have almost exclusively
@@ -1191,29 +1075,8 @@ in the playbook, we could remove it altogether and instead have run it
 using the following command-line string:
 
 ```
-$ ansible-playbook -i production-inventory site.yml --user fenago
+$ ansible-playbook -i production-inventory site.yml --user root
 ```
-
-The ultimate aim of Ansible is to make your life simpler and to remove
-mundane day-to-day tasks from your list. As a result, there is no right
-or wrong way to do this---you can specify your private SSH key using a
-command-line argument or make it available using [ssh-agent].
-Similarly, you can put the [remote\_user] line in your playbook or
-user the [\--user] parameter on the command line. Ultimately, the
-choice is yours, but it is important to consider that if you are
-distributing a playbook to multiple users and they all have to remember
-to specify the remote user on the command line, will they actually
-remember to do it? What will the consequences be if they don\'t? If the
-[remote\_user] line is present in the playbook, will that make
-their lives easier and be less prone to error because the user account
-has been set in the playbook itself?
-
-As with the configuration of Ansible, you will use a small handful of
-the command-line arguments frequently and there will be many that you
-may never touch. The important thing is that you know they are there and
-how to find out about them, and you can make informed decisions about
-when to use them. Let\'s proceed to the next section, where we will look
-in a bit more detail at ad hoc commands with Ansible.
 
 
 
@@ -1347,14 +1210,14 @@ frontend2-emea.example.com | CHANGED | rc=0 >>
 
 
 ```
-$ ansible -i production-inventory frontends_emea_zone -m copy -a "src=/etc/yum.conf dest=/tmp/yum.conf"
+$ ansible -i production-inventory frontends_emea_zone -m copy -a "src=/etc/hosts dest=/root/Desktop/hosts"
 frontend1-emea.example.com | CHANGED => {
     "ansible_facts": {
         "discovered_interpreter_python": "/usr/bin/python"
     },
     "changed": true,
     "checksum": "e0637e631f4ab0aaebef1a6b8822a36f031f332e",
-    "dest": "/tmp/yum.conf",
+    "dest": "/root/Desktop/hosts",
     "gid": 0,
     "group": "root",
     "md5sum": "a7dc0d7b8902e9c8c096c93eb431d19e",
@@ -1371,7 +1234,7 @@ frontend2-emea.example.com | CHANGED => {
     },
     "changed": true,
     "checksum": "e0637e631f4ab0aaebef1a6b8822a36f031f332e",
-    "dest": "/tmp/yum.conf",
+    "dest": "/root/Desktop/hosts",
     "gid": 0,
     "group": "root",
     "md5sum": "a7dc0d7b8902e9c8c096c93eb431d19e",
@@ -1391,15 +1254,6 @@ developing playbooks as it enables you to understand exactly how the
 module works and what output it produces in cases where you need to
 perform further work with that output. This is a more advanced topic,
 however, that is beyond the scope of this introductory lab.
-
-You will also note that all arguments passed to the module must be
-enclosed in quotation marks ([\"]). All arguments are specified as
-[key=value] pairs and no spaces should be added between
-[key] and [value] (for example, [key = value] is not
-acceptable). If you need to place quotation marks around one of your
-argument values, you can escape them using the backslash character (for
-example, [-a \"src=/etc/yum.conf dest=\\\"/tmp/yum
-file.conf\\\"\"])
 
 All examples we have performed so far are very quick to execute and run,
 but this is not always the case with computing tasks. When you have to
@@ -1495,34 +1349,10 @@ other useful information is included, including how long the task
 actually ran for, the end time, and so on. Similarly, the useful output
 is returned when the task exits cleanly.
 
-That concludes our look at ad hoc commands in Ansible. By now, you
-should have a fairly solid grasp of the fundamentals of Ansible, but
-there\'s one important thing we haven\'t looked at yet, even though we
-briefly touched on it---variables and how to define them. We\'ll proceed
-to look at this in the next section.
-
 
 Defining variables
 ==================
 
-In this section, we will cover the topic of variables and how they can
-be defined in Ansible. You will learn how variables should be defined
-step by step and understand how to work with them in Ansible.
-
-Although automation removes much of the repetition from previously
-manual tasks, not every single system is identical. If two systems
-differ in some minor way, you could write two unique playbooks---one for
-each system. However, this would be inefficient and wasteful, as well as
-difficult to manage as time goes on (for example, if the code in one
-playbook is changed, how can you ensure that it is updated in the second
-variant?). 
-
-Equally, you might need to use a value from one system in
-another---perhaps you need to obtain the hostname of a database server
-and make it available to another. All of these issues can be addressed
-with variables as they allow the same automation code to run with
-parameter variations, as well as values to pass from one system to
-another (although this must be handled with some care).
 
 Let\'s get started with a practical look at defining variables in
 Ansible.
@@ -1677,74 +1507,13 @@ message, you could use the same curly brace notation to assign them to
 module parameters, or for any other purpose that your playbook requires
 them for.
 
-Ansible, just like many languages, has specially reserved variables that
-take on particular meaning in playbooks. In Ansible, these are known as
-magic variables and you can find a full list of them
-at <https://docs.ansible.com/ansible/latest/reference_appendices/special_variables.html>.
-Needless to say, you should not attempt to use any magic variable names
-for your own variables. Some common magic variables you might come
-across are as follows:
-
--   [inventory\_hostname]: The hostname for the current host that
-    is iterated over in the play
--   [groups]: A dictionary of the host groups in the inventory,
-    along with the host membership of each group
--   [group\_names]: A list of the groups the current host
-    (specified by [inventory\_hostname]) is part of
--   [hostvars]: A dictionary of all the hosts in the inventory and
-    the variables assigned to each of them
-
-For example, the host variables for all the hosts can be accessed at any
-point in the playbook using [hostvars], even if you are only
-operating on one particular host. Magic variables are surprisingly
-useful in playbooks and you will rapidly start to find yourself using
-them, so it is important to be aware of their existence.
-
-You should also note that you can specify Ansible variables in multiple
-locations. Ansible has a strict order of variable precedence and you can
-take advantage of this by setting default values for variables in a
-place that has low precedence and then overriding them later in the
-play. This is useful for a variety of reasons, especially where an
-undefined variable could cause havoc when a playbook is run (or even
-when the playbook would fail as a result of this). We have not yet
-discussed all of the places that variables can be stored, so the full
-list of variable precedence order is not given here.
-
-In addition, it can change between Ansible releases, so it is important
-that you refer to the documentation when working with and understanding
-variable precedence---go
-to <https://docs.ansible.com/ansible/latest/user_guide/playbooks_variables.html#variable-precedence-where-should-i-put-a-variable> for
-more information.
-
-That concludes our brief overview of variables in Ansible, although we
-will see them used again in later examples in this course. Let\'s now
-round off this lab with a look at Jinja2 filters, which add a whole
-world of power to your variable definitions.
 
 
 Understanding Jinja2 filters
 ============================
 
-As Ansible is written in Python, it inherits an incredibly useful and
-powerful templating engine called Jinja2. We will look at the concept of
-templating later in this course, so for now, we will focus on one
-particular aspect of Jinja2 known as filtering. Jinja2 filters provide
-an incredibly powerful framework that you can use to manipulate and
-transform your data. Perhaps you have a string that you need to convert
-to lowercase, for example---you could apply a Jinja2 filter to achieve
-this. You can also use it to perform pattern matching, search and
-replace operations, and much more. There are many hundreds of filters
-for you to work with and in this section, we hope to empower you with a
-basic understanding of Jinja2 filters and some practical knowledge about
-how to apply them, as well as show you where to get more information
-about them if you wish to explore the subject further. 
 
-It is worth noting that Jinja2 operations are performed on the Ansible
-control host and only the results of the filter operation are sent to
-the remote hosts. This is done by design, both for consistency and to
-reduce the workload on the individual nodes as much as possible. 
-
-Let\'s explore this through a practical example. Suppose we have a YAML
+Let\'s explore through a practical example. Suppose we have a YAML
 file containing some data that we want to parse. We can quite easily
 read a file from the machine filesystem and capture the result using the
 [register] keyword ([register] captures the result of the
@@ -1801,7 +1570,7 @@ valid Ansible list. If we run the playbook, we should see Ansible\'s
 representation of the data structure from within our original file:
 
 ```
-$ ansible-playbook -i localhost, jinja-filtering1.yml
+$ ansible-playbook -i localhost, jinja2-filtering1.yml
 
 PLAY [Jinja2 filtering demo 1] *************************************************
 
@@ -1864,6 +1633,8 @@ neat set of [key: value] pairs:
 
 ```
 $ ansible-playbook -i localhost, jinja2-filtering2.yml
+
+
 [WARNING]: Found variable using reserved name: tags
 
 PLAY [Jinja2 filtering demo 2] *************************************************
@@ -1912,6 +1683,7 @@ playbook::
 When we run this, we can see that Ansible has captured the contents of
 the [/etc/hosts] file for us, without us needing to resort to the
 [copy] and [shell] modules as we did earlier:
+
 
 ```
 $ ansible-playbook -i localhost, jinja2-filtering3.yml
@@ -1965,14 +1737,6 @@ find information.
 Summary
 =======
 
-Ansible is a very powerful and versatile automation engine that can be
-used for a wide variety of tasks. Understanding the basics of how to
-work it is of paramount importance, before addressing the more complex
-challenges of playbook creation and large-scale automation. Ansible
-relies on a language called YAML, a simple-to-read (and write) syntax
-that supports the rapid development of easy-to-read and easy-to-maintain
-code and inherits a number of valuable features from the Python language
-that it is written in, including Jinja2 filtering.
 
 In this lab, you learned the fundamentals of working with various
 Ansible programs. You then learned about the YAML syntax and the ways

@@ -19,55 +19,31 @@ Creating an inventory file and adding hosts
 
 Most Ansible installations will look for a default inventory file in
 [/etc/ansible/hosts] (though this path is configurable in the
-Ansible configuration file). You are welcome to
-populate this file or to provide your own inventory for each playbook
-run, and it is commonplace to see inventories provided alongside
-playbooks. After all, there\'s rarely a \"one size fits all\" playbook,
-and although you can subdivide your inventory with groups (more on this
-later), it can often be just as easy to provide a smaller static
-inventory file alongside a given playbook. As you will have seen in the
-earlier labs of this course, most Ansible commands use the [-i]
+Ansible configuration file). Most Ansible commands use the [-i]
 flag to specify the location of the inventory file if not using the
 default. Hypothetically, this might look like the following example:
 
 ```
-$ ansible -i /home/cloud-user/inventory all -m ping
+$ ansible -i /root/Desktop/ansible-course/Lab_3/my_inventory all -m ping
 ```
 
 
 In this lab, we will provide some examples of both INI and YAML
-formatted inventory files for you to consider, as you must have an
-awareness of both. Personally, I have worked with Ansible for many years
-and worked with either INI-formatted files or dynamic inventories, but
-they say knowledge is power and so it will do no harm to learn a little
-about both formats.
-
-Let\'s start by creating a static inventory file. This inventory file
+formatted inventory files. Let\'s start by creating a static inventory file. This inventory file
 will be separate from the default inventory.
 
 Create an inventory file in [/etc/ansible/my\_inventory] using the
 following INI-formatted code:
 
 ```
-target1.example.com ansible_host=192.168.81.142 ansible_port=3333
+target1.example.com ansible_host=127.0.0.1 ansible_port=22
 
-target2.example.com ansible_port=3333 ansible_user=fenago
+target2.example.com ansible_port=22 ansible_user=root
 
-target3.example.com ansible_host=192.168.81.143 ansible_port=5555
+target3.example.com ansible_host=127.0.0.1 ansible_port=22
 ```
 
 
-
-Hence, the preceding three hosts can be summarized as follows:
-
--   The [target1.example.com] host should be connected to using
-    the [192.168.81.142] IP address, on port [3333].
--   The [target2.example.com] host should be connected to on port
-    [3333] also, but this time using
-    the [fenago] user rather than the account running the
-    Ansible command.
--   The [target3.example.com] host should be connected to using
-    the [192.168.81.143] IP address, on port [5555].
 
 In this way, even with no further constructs, you can begin to see the
 power of static INI-formatted inventories.
@@ -81,29 +57,25 @@ follows:
 ungrouped:
   hosts:
     target1.example.com:
-      ansible_host: 192.168.81.142
-      ansible_port: 3333
+      ansible_host: 127.0.0.1
+      ansible_port: 22
     target2.example.com:
-      ansible_port: 3333
-      ansible_user: fenago
+      ansible_port: 22
+      ansible_user: root
     target3.example.com:
-      ansible_host: 192.168.81.143
-      ansible_port: 5555
+      ansible_host: 127.0.0.1
+      ansible_port: 22
 ```
 
-You may come across inventory file examples containing parameters such
-as [ansible\_ssh\_port], [ansible\_ssh\_host], and
-[ansible\_ssh\_user]--these variable names (and others like them)
-were used in Ansible versions before 2.0. Backward compatibility has
-been maintained for many of these, but you should update them where
-possible as this compatibility may be removed at some point in the
-future.
+
 
 Now if you were to run the preceding inventory within Ansible, using a
 simple [shell] command, the result would appear as follows:
 
 ```
 $ ansible -i /etc/ansible/my_inventory.yaml all -m shell -a 'echo hello-yaml' -f 5
+
+
 target1.example.com | CHANGED | rc=0 >>
 hello-yaml
 target2.example.com | CHANGED | rc=0 >>
@@ -241,6 +213,7 @@ command:
 
 ```
 $ ansible -i hostgroups-yml centos -m shell -a 'echo hello-yaml' -f 5
+
 app01.example.com | CHANGED | rc=0 >>
 hello-yaml
 app02.example.com | CHANGED | rc=0 >>
@@ -342,6 +315,7 @@ contents of both of these variables:
 
 ```
 $ ansible -i hostvars1-hostgroups-ini frontends -m debug -a "msg=\"Connecting to {{ lb_vip }}, listening on {{ https_port }}\""
+
 frt01.example.com | SUCCESS => {
     "msg": "Connecting to lb.example.com, listening on 8443"
 }
@@ -451,16 +425,7 @@ frt02.example.com | SUCCESS => {
     that deserves special mention and will become valuable to you as
     your inventory becomes larger and more complex.
 
-Right now, our examples are small and compact and only contain a handful
-of groups and variables; however, when you scale this up to a full
-infrastructure of servers, using a single flat inventory file could,
-once again, become unmanageable. Luckily, Ansible also provides a
-solution to this. Two specially-named directories, [host\_vars]
-and [group\_vars], are automatically searched for appropriate
-variable content if they exist within the playbook directory. We can
-test this out by recreating the preceding frontend variables example
-using this special directory structure, rather than putting the
-variables into the inventory file.
+
 
 Let\'s start by creating a new directory structure for this purpose:
 
@@ -820,21 +785,7 @@ frontend02.example.com | SUCCESS => {
 }
 ```
 
-That\'s it! You have just implemented your first dynamic inventory in
-Ansible. Of course, we know that many readers won\'t be using Cobbler,
-and some of the other dynamic inventory plugins are a little more
-complex to get going. For example, the Amazon EC2 dynamic inventory
-script requires your authentication details for Amazon Web Services (or
-a suitable IAM account) and the installation of the Python [boto]
-and [boto3] libraries. How would you know to do all of this?
-Luckily, it is all documented in the headers of either the dynamic
-inventory script or the configuration file, so the most fundamental
-piece of advice I can give is this: whenever you download a new dynamic
-inventory script, be sure to check out the files themselves in your
-favorite editor as their requirements have most likely been documented
-for you.
-
-
+That\'s it! You have just implemented your first dynamic inventory in Ansible.
 
 
 Using multiple inventory sources in the inventory directories
@@ -858,19 +809,6 @@ multiple-inventory functionality.
 
 Using static groups with dynamic groups
 ---------------------------------------
-
-Of course, the possibility of mixing inventories brings with it an
-interesting question---what happens to the groups from a dynamic
-inventory and a static inventory if you define both? The answer is that
-Ansible combines both, and this leads to an interesting possibility. As
-you will have observed, our Cobbler inventory script produced an Ansible
-group called [webservers] from a Cobbler profile that we called
-[webservers]. This is common for most dynamic inventory providers;
-most inventory sources (for example, Cobbler and Amazon EC2) are not
-Ansible-aware and so do not offer groups that Ansible can directly use.
-As a result, most dynamic inventory scripts will use some facet of
-information from the inventory source to produce groupings, the Cobbler
-machine profile being one such example.
 
 Let\'s extend our Cobbler example from the preceding section by mixing a
 static inventory. Suppose that we want to make our [webservers]
@@ -1155,3 +1093,4 @@ A\) True
 B\) False
 
 
+c

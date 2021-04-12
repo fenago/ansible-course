@@ -19,6 +19,8 @@ In this lab, we will cover the following topics:
 
 #### Lab Environment
 
+Note that `root` user password is **fenago**
+
 All lab file are present at below path. Run following command in the terminal first before running commands in the lab:
 
 `cd ~/Desktop/ansible-course/Lab_2` 
@@ -96,6 +98,10 @@ PING frontend.example.com (127.0.0.1) 56(84) bytes of data.
 ```
 
 
+
+<span style="color:red;"> Below steps are optional as key has been created already and copied using "ssh-copy-id" utility. Make sure to complete all instructions if new key is created as old key will be overwritten.</span>
+
+
 2.  To make the automation process seamless, we\'ll generate an SSH
     authentication key pair so that we don\'t have to type in a password
     every time we want to run a playbook. If you do not already have an
@@ -113,6 +119,7 @@ which removes the convenience of authenticating with SSH keys:
 
 ```
 $ ssh-keygen 
+
 Generating public/private rsa key pair.
 Enter file in which to save the key (/Users/doh/.ssh/id_rsa): <Enter>
 Enter passphrase (empty for no passphrase): <Press Enter>
@@ -156,6 +163,7 @@ following command:
 
 ```
 $  ssh-copy-id -i ~/.ssh/id_rsa.pub frontend.example.com
+
 /usr/bin/ssh-copy-id: INFO: Source of key(s) to be installed: "~/.ssh/id_rsa.pub"
 /usr/bin/ssh-copy-id: INFO: attempting to log in with the new key(s), to filter out any that are already installed
 /usr/bin/ssh-copy-id: INFO: 1 key(s) remain to be installed -- if you are prompted now it is to install the new keys
@@ -528,12 +536,8 @@ We could add trailing spaces to the preceding example to stop the words
 from running into each other, but I have not done this here as I wanted
 to provide you with an easy-to-interpret example.
 
-As you review playbooks, variable files, and so on, you will see these
-structures used over and over again. Although simple in definition, they
-are very important---a missed level of indentation or a missing
-[-] instance at the start of a list item can cause your entire
-playbook to fail to run. As we discovered, you can put all of these
-various constructs together. One additional example is provided in the
+
+One additional example is provided in the
 following code block of a [variables] file for you to consider,
 which shows the various examples we have covered all in one place:
 
@@ -606,15 +610,6 @@ organize your automation code to keep it manageable and tidy.
 Organizing your automation code
 -------------------------------
 
-As you can imagine, if you were to write all of your required Ansible
-tasks in one massive playbook, it would quickly become
-unmanageable---that is to say, it would be difficult to read, difficult
-for someone else to pick up and understand, and---most of
-all---difficult to debug when things go wrong. Ansible provides a number
-of ways for you to divide your code into manageable chunks; perhaps the
-most important of these is the use of roles. Roles (for the sake of a
-simple analogy) behave like a library in a conventional high-level
-programming language.
 
 Let\'s build up a practical example. To start, we know that we need to
 create an inventory for Ansible to run against. In this instance, we\'ll

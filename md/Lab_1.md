@@ -21,6 +21,8 @@ In this lab, we will cover the following topics:
 
 #### Lab Environment
 
+Note that `root` user password is **fenago**
+
 All lab file are present at below path. Run following command in the terminal first before running commands in the lab:
 
 `cd ~/Desktop/ansible-course/Lab_1` 
@@ -51,7 +53,7 @@ $ sudo apt-get install ansible
 
 
 ```
-sudo pip3 install ansible
+pip3 install ansible
 ```
 
 
@@ -76,7 +78,7 @@ via the following command:
 
 
 ```
-$ sudo pip3 install ansible --upgrade
+pip3 install ansible --upgrade
 ```
 
 
@@ -126,6 +128,7 @@ following [ansible] command, you see a similar output to this: 
 
 ```
 $ ansible webservers -m ping 
+
 web1.example.com | SUCCESS => {
     "changed": false, 
     "ping": "pong"
@@ -142,7 +145,6 @@ $
 Notice that the [ping] module was only run on the two hosts in the
 [webservers] group and not the entire inventory --- this was by
 virtue of us specifying this in the command-line parameters.
-
 
 
 
@@ -205,6 +207,7 @@ format---the following example output results from running the
 
 ```
 $ ansible frontends -m ping 
+
 frontend01.example.com | SUCCESS => {
     "changed": false, 
     "ping": "pong"
@@ -216,14 +219,7 @@ frontend02.example.com | SUCCESS => {
 ```
 
 
-Ansible can also gather and return \"facts\" about your target
-hosts---facts are all manner of useful information about your hosts,
-from CPU and memory configuration to network parameters, to disk
-geometry. These facts are intended to enable you to write intelligent
-playbooks that perform conditional actions---for example, you might only
-want to install a given software package on hosts with more than 4 GB of
-RAM or perhaps perform a specific configuration only on macOS hosts. The
-following is an example of the filtered facts from a macOS-based host:
+The following is an example of the filtered facts from a host:
 
 
 ```
@@ -288,7 +284,7 @@ $ ansible frontends -m apt -a "name=apache2 state=present"
     present, and update it to the latest version if it is present:
 
 ```
-$ ansible frontends -m apt -a "name=demo-tomcat-1 state=latest" 
+$ ansible frontends -m apt -a "name=apache2 state=latest" 
 ```
 
 -   Display all facts about all the hosts in your inventory
@@ -303,52 +299,6 @@ and about how to run ad hoc commands, let\'s proceed to look in a bit
 more detail at the requirements of the nodes that are to be managed by
 Ansible.
 
-
-
-Managed node requirements
--------------------------
-
-
-If your target hosts are lacking Python, it is usually easy to install
-it through your operating system\'s package management system. Ansible
-requires you to install either Python version 2.7 or 3.5 (and above) on
-both the Ansible control machine (as we covered earlier in this lab)
-and on every managed node.
-
-
--   On Debian and Ubuntu systems, you would use the [apt] package
-    manager to install Python, again specifying a version if required
-    (the example given here is to install Python 3.6 and would work on
-    Ubuntu 18.04):
-
-```
-$ sudo apt-get update
-$ sudo apt-get install python3.6
-```
-
-
-The following are some examples of tasks in an Ansible playbook that you
-might use to bootstrap a managed node and prepare it for Ansible
-management:
-
-```
-- name: Bootstrap a host without python2 installed
-  raw: dnf install -y python2 python2-dnf libselinux-python
-
-- name: Run a command that uses non-posix shell-isms (in this example /bin/sh doesn't handle redirection and wildcards together but bash does)
-  raw: cat < /tmp/*txt
-  args:
-    executable: /bin/bash
-
-- name: safely use templated variables. Always use quote filter to avoid injection issues.
-  raw: "{{package_mgr|quote}} {{pkg_flags|quote}} install {{python|quote}}"
-```
-
-We have now covered the basics of setting up Ansible both on the control
-host and on the managed nodes, and we have given you a brief primer on
-configuring your first connections. Before we wrap up this lab, we
-will look in more detail at how you might run the latest development
-version of Ansible, direct from GitHub.
 
 
 Running from source versus pre-built RPMs
@@ -419,6 +369,7 @@ we are now familiar with, as follows:
 
 ```
 $ ~/ansible/bin/ansible all -m ping
+
 ap1.example.com | SUCCESS => {
     "changed": false, 
     "ping": "pong"

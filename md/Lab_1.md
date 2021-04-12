@@ -81,32 +81,8 @@ $ sudo pip3 install ansible --upgrade
 Understanding how Ansible connects to hosts
 -------------------------------------------
 
-Ansible uses the SSH protocol to communicate with
-hosts. The reasons for this choice in the Ansible design are many, not
-least that just about every Linux/FreeBSD/macOS host has it built in, as
-do many network devices such as switches and routers. This SSH service
-is normally integrated with the operating system authentication stack,
-enabling you to take advantage of things such as Kerberos to improve
-authentication security. Also, features of OpenSSH such as
-[ControlPersist] are used to increase the performance of the
-automation tasks and SSH jump hosts for network isolation and security.
 
-
-
-Ansible makes use of the same authentication methods that you will
-already be familiar with, and SSH keys are normally the easiest way to
-proceed as they remove the need for users to input the authentication
-password every time a playbook is run. However, this is by no means
-mandatory, and Ansible supports password authentication through the use
-of the [\--ask-pass] switch. If you are connecting to an
-unprivileged account on the hosts, and need to perform the Ansible
-equivalent of running commands under [sudo], you can also add
-[\--ask-become-pass] when you run your playbooks to allow this to
-be specified at runtime as well.
-
-
-
-For now, let\'s focus on the INI formatted inventory. An example is
+Let\'s focus on the INI formatted inventory. An example is
 shown here with four servers, each split into two groups. Ansible
 commands and playbooks can be run against an entire inventory (that is,
 all four servers), one or more groups (for example, [webservers]),
@@ -143,7 +119,6 @@ following [ansible] command, you see a similar output to this: 
 
 
 
-
 ```
 $ ansible webservers -m ping 
 web1.example.com | SUCCESS => {
@@ -160,15 +135,9 @@ $
 
 
 Notice that the [ping] module was only run on the two hosts in the
-[webservers] group and not the entire inventory---this was by
+[webservers] group and not the entire inventory --- this was by
 virtue of us specifying this in the command-line parameters.
 
-
-We have so far covered a brief explanation of how Ansible communicates
-with its target hosts, including what inventories are and the importance
-of SSH communication to all except Windows hosts. In the next section,
-we will build on this by looking in greater detail at how to verify your
-Ansible installation.
 
 
 
@@ -179,26 +148,11 @@ In this section, you will learn how you can verify your Ansible
 installation with simple ad hoc commands.
 
 
-The [ssh-copy-id] utility is incredibly useful for distributing
-your public SSH key to your target hosts before you proceed any further.
-An example command might be [ssh-copy-id -i \~/.ssh/id\_rsa
-ansibleuser\@web1.example.com].
-
-
-To ensure Ansible can authenticate with your private key, you could make
-use of [ssh-agent]---the commands show a simple example of how to
-start [ssh-agent] and add your private key to it. Naturally, you
-should replace the path with that to your own private key:
-
-
-```
-$ ssh-agent bash 
-$ ssh-add ~/.ssh/id_rsa
-```
 
 As we discussed in the previous section, we must also define an
 inventory for Ansible to run against. Another simple example is shown
 here:
+
 
 ```
 [frontends]
@@ -207,12 +161,6 @@ frt02.example.com
 ```
 
 
-The [ansible] command that we used in the previous section has two
-important switches that you will almost always use: [-m
-\<MODULE\_NAME\>] to run a module on the hosts from your inventory
-that you specify and, optionally, the module arguments passed using
-the [-a OPT\_ARGS] switch. Commands run using the [ansible]
-binary are known as ad hoc commands.
 
 Following are three simple examples that demonstrate ad hoc
 commands---they are also valuable for verifying both the installation of
@@ -240,6 +188,10 @@ $ ansible frontends -i hosts -m setup | less
 ```
 $ ansible frontends -i hosts -m setup -a "filter=ansible_distribution*"
 ```
+
+
+<span style="color:red;">Note: Check `/root/hosts` file and verify that host information entries exist (because `-i hosts` path is specified so ansible will look in `~/hosts` file)
+</span>
 
 For every ad hoc command you run, you will get a response in JSON
 format---the following example output results from running the
@@ -270,15 +222,20 @@ following is an example of the filtered facts from a macOS-based host:
 
 
 ```
-$ ansible frontend01.example.com -m setup -a "filter=ansible_distribution*"
-frontend01.example.com | SUCCESS => {
- ansible_facts": {
- "ansible_distribution": "macOS", 
- "ansible_distribution_major_version": "10", 
- "ansible_distribution_release": "18.5.0", 
- "ansible_distribution_version": "10.14.4"
- }, 
- "changed": false
+$ ansible localhost -m setup -a "filter=ansible_distribution*"
+
+localhost | SUCCESS => {
+    "ansible_facts": {
+        "ansible_distribution": "Ubuntu",
+        "ansible_distribution_file_parsed": true,
+        "ansible_distribution_file_path": "/etc/os-release",
+        "ansible_distribution_file_variety": "Debian",
+        "ansible_distribution_major_version": "20",
+        "ansible_distribution_release": "focal",
+        "ansible_distribution_version": "20.04"
+    },
+    "changed": false
+}
 ```
 
 
@@ -294,7 +251,7 @@ hoc examples for you to consider:
     [frontends] group with the following command:
 
 ```
-$ ansible frontends -m copy -a "src=/etc/apt.conf dest=/tmp/apt.conf"
+$ ansible frontends -m copy -a "src=/etc/hosts dest=/root/Desktop/hosts"
 ```
 
 -   Create a new directory on all hosts in the
@@ -346,22 +303,12 @@ Ansible.
 Managed node requirements
 -------------------------
 
-So far, we have focused almost exclusively on the requirements for the
-Ansible control host and have assumed that (except for the distribution
-of the SSH keys) the target hosts will just work. This, of course, is
-not always the case, and for example, while a modern installation of
-Linux installed from an ISO will often just work, cloud operating system
-images are often stripped down to keep them small, and so might lack
-important packages such as Python, without which Ansible cannot operate.
 
 If your target hosts are lacking Python, it is usually easy to install
 it through your operating system\'s package management system. Ansible
 requires you to install either Python version 2.7 or 3.5 (and above) on
 both the Ansible control machine (as we covered earlier in this lab)
 and on every managed node.
-
-If you are working with operating system images that lack Python, the
-following commands provide a quick guide to getting Python installed:
 
 
 -   On Debian and Ubuntu systems, you would use the [apt] package
@@ -374,28 +321,6 @@ $ sudo apt-get update
 $ sudo apt-get install python3.6
 ```
 
-The [ping] module we discussed earlier in this lab for Ansible
-not only checks connectivity and authentication with your managed hosts,
-but it uses the managed hosts\' Python environment to perform some basic
-host checks. As a result, it is a fantastic end-to-end test to give you
-confidence that your managed hosts are configured correctly as hosts,
-with the connectivity and authentication set up perfectly, but where
-Python is missing, it would return a [failed] result.
-
-Of course, a perfect question at this stage would be: how can Ansible
-help if you roll out 100 cloud servers using a stripped-down base image
-without Python? Does that mean you have to manually go through all 100
-nodes and install Python by hand before you can start automating?
-
-Thankfully, Ansible has you covered even in this case, thanks to the
-[raw] module. This module is used to send raw shell commands to
-the managed nodes---and it works both with SSH-managed hosts and Windows
-PowerShell-managed hosts. As a result, you can use Ansible to install
-Python on a whole set of systems from which it is missing, or even run
-an entire shell script to bootstrap a managed node. Most importantly,
-the raw module is one of very few that does not require Python to be
-installed on the managed node, so it is perfect for our use case where
-we must roll out Python to enable further automation. 
 
 The following are some examples of tasks in an Ansible playbook that you
 might use to bootstrap a managed node and prepare it for Ansible
@@ -424,17 +349,8 @@ version of Ansible, direct from GitHub.
 Running from source versus pre-built RPMs
 =========================================
 
-Ansible is always rapidly evolving, and there may be times, either for
-early access to a new feature (or module) or as part of your own
-development efforts, that you wish to run the latest, bleeding-edge
-version of Ansible from GitHub. In this section, we will look at how you
-can quickly get up and running with the source code. The method outlined
-in this lab has the advantage that, unlike package-manager-based
-installs that must be performed as root, the end result is a working
-installation of Ansible without the need for any root privileges. 
 
-Let\'s get started by checking out the very latest version of the source
-code from GitHub:
+Let\'s get started by checking out the very latest version of the source code from GitHub:
 
 1.  You must clone the sources from the [git] repository first,
     and then change to the directory containing the checked-out code:
@@ -489,12 +405,6 @@ $ export ANSIBLE_INVENTORY=~/my_ansible_inventory
 ```
 
 
-
-
-[ANSIBLE\_INVENTORY] applies to Ansible version 1.9 and above and
-replaces the deprecated [ANSIBLE\_HOSTS] environment variable.
-
-
 Once you have completed these steps, you can run Ansible exactly as we
 have discussed throughout this lab, with the exception that you must
 specify the absolute path to it. For example, if you set up your
@@ -540,8 +450,6 @@ installation process. Ansible was designed to get you from zero to
 automation rapidly and with minimal effort, and we have demonstrated the
 simplicity with which you can get up and running with Ansible in this
 lab.
-
-
 
 In the next lab, we will learn Ansible language fundamentals to
 enable you to write your first playbooks and to help you to create

@@ -1211,6 +1211,7 @@ frontend2-emea.example.com | CHANGED | rc=0 >>
 
 ```
 $ ansible -i production-inventory frontends_emea_zone -m copy -a "src=/etc/hosts dest=/root/Desktop/hosts"
+
 frontend1-emea.example.com | CHANGED => {
     "ansible_facts": {
         "discovered_interpreter_python": "/usr/bin/python"

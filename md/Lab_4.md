@@ -75,12 +75,12 @@ Let\'s dive right in and get started writing a playbook.
 ```
 ---
 - hosts: frontends
-  remote_user: danieloh
+  remote_user: fenago
 
   tasks:
   - name: simple connection test
     ping:
-    remote_user: danieloh
+    remote_user: fenago
 ```
 
 2.  Add another task below the first to run the [shell] module

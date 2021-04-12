@@ -1,6 +1,6 @@
 ---
 - hosts: appservers_emea_zone
-  remote_user: danieloh
+  remote_user: fenago
   tasks:
     - name: simple connection test
       ping:

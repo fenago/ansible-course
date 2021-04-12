@@ -128,7 +128,7 @@ Enter same passphrase again: <Press Enter>
 Your identification has been saved in /Users/doh/.ssh/id_rsa.
 Your public key has been saved in /Users/doh/.ssh/id_rsa.pub.
 The key fingerprint is:
-SHA256:1IF0KMMTVAMEQF62kTwcG59okGZLiMmi4Ae/BGBT+24 doh@danieloh.com
+SHA256:1IF0KMMTVAMEQF62kTwcG59okGZLiMmi4Ae/BGBT+24 doh@fenago.com
 The key's randomart image is:
 +---[RSA 2048]----+
 |=*=*BB==+oo |
@@ -309,8 +309,8 @@ first example playbook:
 ```
   tasks:
   - name: Update the latest of an Apache Web Server
-    yum:
-      name: httpd
+    apt:
+      name: apache2
       state: latest
     notify:
       - Restart an Apache Web Server
@@ -318,7 +318,7 @@ first example playbook:
  handlers:
  - name: Restart an Apache Web Server
    service:
-     name: httpd
+     name: apache2
      state: restarted
 ```
 
@@ -517,7 +517,7 @@ quite complicated data structures by mixing lists and dictionaries. 
 ---
 employees:
   - name: daniel
-    fullname: Daniel Oh
+    fullname: Fenago
     role: DevOps Evangelist
     level: Expert
     skills:
@@ -616,7 +616,7 @@ servers:
   - cache
 employees:
   - name: daniel
-    fullname: Daniel Oh
+    fullname: Fenago
     role: DevOps Evangelist
     level: Expert
     skills:
@@ -645,7 +645,7 @@ same data structure as our original [employees] variable file:
 
 ```
 ---
-employees: [{"fullname": "Daniel Oh","level": "Expert","name": "daniel","role": "DevOps Evangelist","skills": ["Kubernetes","Microservices","Ansible","Linux Container"]},{"fullname": "Michael Smiths","level": "Advanced","name": "michael","role": "Enterprise Architect","skills":["Cloud","Middleware","Windows","Storage"]}]
+employees: [{"fullname": "Fenago","level": "Expert","name": "daniel","role": "DevOps Evangelist","skills": ["Kubernetes","Microservices","Ansible","Linux Container"]},{"fullname": "Michael Smiths","level": "Advanced","name": "michael","role": "Enterprise Architect","skills":["Cloud","Middleware","Windows","Storage"]}]
 ```
 
 Although this displays exactly the same data structure, you can see how
@@ -726,7 +726,7 @@ playbooks:
 ```
 ---
 - hosts: frontends_na_zone
-  remote_user: danieloh
+  remote_user: fenago
   tasks:
     - name: simple connection test
       ping:
@@ -734,7 +734,7 @@ playbooks:
 
 2.  Now, try running this playbook against the hosts (note that we have
     configured it to connect to a remote user on the inventory system,
-    called [danieloh], so you will either need to create this user
+    called [fenago], so you will either need to create this user
     and set up the appropriate SSH keys or change the user in the
     [remote\_user] line of your playbook). When you run the
     playbook after setting up the authentication, you should see an
@@ -770,14 +770,14 @@ frontend2-na.example.com : ok=2 changed=0 unreachable=0 failed=0 skipped=0 rescu
 ```
 ---
 - hosts: appservers_emea_zone
-  remote_user: danieloh
+  remote_user: fenago
   tasks:
     - name: simple connection test
       ping:
 ```
 
 As before, you need to ensure you can access these servers, so either
-create the [danieloh] user and set up authentication to that
+create the [fenago] user and set up authentication to that
 account or change the [remote\_user] line in the example playbook.
 Once you have done this, you should be able to run the playbook and you
 will see an output similar to the following:
@@ -1045,7 +1045,7 @@ follows:
 ```
 # Set my configuration variables
 [defaults]
-inventory = /Users/danieloh/ansible/hosts ; Here is the path of the inventory file
+inventory = /Users/fenago/ansible/hosts ; Here is the path of the inventory file
 ```
 
 As discussed earlier, one of the possible valid locations for
@@ -1191,7 +1191,7 @@ in the playbook, we could remove it altogether and instead have run it
 using the following command-line string:
 
 ```
-$ ansible-playbook -i production-inventory site.yml --user danieloh
+$ ansible-playbook -i production-inventory site.yml --user fenago
 ```
 
 The ultimate aim of Ansible is to make your life simpler and to remove
@@ -1286,7 +1286,7 @@ Sun 5 Apr 18:55:30 BST 2020
 
 
 ```
-$ ansible -i production-inventory frontends_emea_zone -a /usr/sbin/pvs -u danieloh
+$ ansible -i production-inventory frontends_emea_zone -a /usr/sbin/pvs -u fenago
 
 frontend2-emea.example.com | FAILED | rc=5 >>
   WARNING: Running as a non-root user. Functionality may be unavailable.
@@ -1302,7 +1302,7 @@ frontend1-emea.example.com | FAILED | rc=5 >>
   Unable to obtain global lock.non-zero return code
 ```
 
-3.  Here, we can see that the [danieloh] user account does not
+3.  Here, we can see that the [fenago] user account does not
     have the privileges required to successfully run the [pvs]
     command. However, we can fix this by adding the [\--become]
     command-line argument, which tells Ansible to become [root] on
@@ -1310,7 +1310,7 @@ frontend1-emea.example.com | FAILED | rc=5 >>
 
 
 ```
-$ ansible -i production-inventory frontends_emea_zone -a /usr/sbin/pvs -u danieloh --become
+$ ansible -i production-inventory frontends_emea_zone -a /usr/sbin/pvs -u fenago --become
 
 frontend2-emea.example.com | FAILED | rc=-1 >>
 Missing sudo password
@@ -1319,14 +1319,14 @@ Missing sudo password
 ```
 
 4.  We can see that the command still fails because although
-    [danieloh] is in [/etc/sudoers], it is not allowed to
+    [fenago] is in [/etc/sudoers], it is not allowed to
     run commands as [root] without entering a [sudo]
     password. Luckily, there\'s a switch to get Ansible to prompt us for
     this at run time, meaning we don\'t need to edit our
     [/etc/sudoers] file:
 
 ```
-$ ansible -i production-inventory frontends_emea_zone -a /usr/sbin/pvs -u danieloh --become --ask-become-pass
+$ ansible -i production-inventory frontends_emea_zone -a /usr/sbin/pvs -u fenago --become --ask-become-pass
 BECOME password:
 
 frontend1-emea.example.com | CHANGED | rc=0 >>

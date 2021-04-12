@@ -1354,7 +1354,7 @@ module with the upstream Ansible project:
     account:
 
 ```
-$ git clone https://github.com/danieloh30/ansible.git
+$ git clone https://github.com/fenago/ansible.git
 ```
 
 2.  Copy your module code into the appropriate modules directory -- the

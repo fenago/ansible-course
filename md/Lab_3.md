@@ -51,7 +51,7 @@ following INI-formatted code:
 ```
 target1.example.com ansible_host=192.168.81.142 ansible_port=3333
 
-target2.example.com ansible_port=3333 ansible_user=danieloh
+target2.example.com ansible_port=3333 ansible_user=fenago
 
 target3.example.com ansible_host=192.168.81.143 ansible_port=5555
 ```
@@ -64,7 +64,7 @@ Hence, the preceding three hosts can be summarized as follows:
     the [192.168.81.142] IP address, on port [3333].
 -   The [target2.example.com] host should be connected to on port
     [3333] also, but this time using
-    the [danieloh] user rather than the account running the
+    the [fenago] user rather than the account running the
     Ansible command.
 -   The [target3.example.com] host should be connected to using
     the [192.168.81.143] IP address, on port [5555].
@@ -85,7 +85,7 @@ ungrouped:
       ansible_port: 3333
     target2.example.com:
       ansible_port: 3333
-      ansible_user: danieloh
+      ansible_user: fenago
     target3.example.com:
       ansible_host: 192.168.81.143
       ansible_port: 5555

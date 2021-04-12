@@ -1002,7 +1002,7 @@ $ git add myplaybook.yml
 ```
 $ git commit -m 'Added new spongle-widget deployment to myplaybook.yml'
 [master ed14138] Added new spongle-widget deployment to myplaybook.yml
- Committer: Daniel Oh <doh@danieloh.redhat.com>
+ Committer: Fenago <ansible@fenago.com>
 Your name and email address were configured automatically based
 on your username and hostname. Please check that they are accurate.
 You can suppress this message by setting them explicitly. Run the

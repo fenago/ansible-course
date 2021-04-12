@@ -1,6 +1,6 @@
 ---
 - hosts: frontends_na_zone
-  remote_user: danieloh
+  remote_user: fenago
   tasks:
     - name: simple connection test
       ping:

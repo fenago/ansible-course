@@ -170,10 +170,6 @@ Let's change the default Apache port using template as port 80 is already in use
         state: restarted
 ```
 
-### ProTip
-
-Open http://localhost:80 in browser to verify that apache is running now.
-
 
 If we run this task a first time, we
 will see the following results:
@@ -193,12 +189,10 @@ PLAY RECAP *********************************************************************
 frt01.example.com : ok=2 changed=2 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0
 ```
 
-<span style="color:red;">Note: You will get and error because port 80 is already in use. We can change the port as shown the next step.</span>
 
+### ProTip
 
-#### Change Apache Port
-
-We can change the default Apache port. Open `/etc/apache2/ports.conf` and update `80` with port `81`. Save and close the file.
+Open http://localhost:81 in Mirdori browser to verify that apache is running now.
 
 
 Notice how the handler was run at the end, as the configuration file was
@@ -288,23 +282,7 @@ section.
 Comparing playbooks and ad hoc tasks
 ------------------------------------
 
-Ad hoc commands allow you to quickly create and execute one-off
-commands, without keeping any record of what was done (other than
-perhaps your shell history). These serve an important purpose and can be
-very valuable in getting small changes made quickly and for learning
-Ansible and its modules.
-
-Playbooks, by contrast, are logically organized sets of tasks (each
-could conceivably be an ad hoc command), put together in a sequence that
-performs one bigger action. The addition of conditional logic, error
-handling, and so on means that, very often, the benefits of playbooks
-outweigh the usefulness of ad hoc commands. In addition, provided you
-keep them organized, you will have copies of all previous playbooks that
-you run and so you will be able to refer back (if ever you need to) to
-see what you ran and when.
-
-Let\'s develop a practical example---suppose you want to install Apache
-2.4 on CentOS. There are a number of steps involved even if the default
+Let\'s develop a practical example---suppose you want to install Apache. There are a number of steps involved even if the default
 configuration is sufficient (which is unlikely, but for now, we\'ll keep
 the example simple). If you were to perform the basic installation by
 hand, you would need to install the package, open up the firewall, and
@@ -318,7 +296,8 @@ $ sudo service apache2 start
 $ sudo service apache2 status
 ```
 
-**Note:** Start will because port 80 is alredy in use by lab environment.
+**Note:** Start will fail because port 80 is alredy in use by lab environment. make sure tha  `/etc/apache2/ports.conf` is updated; port `80` with port `81`.
+
 
 Now, for each of these commands, there is an equivalent ad hoc Ansible
 command that you could run. We won\'t go through all of them here in the
@@ -337,6 +316,7 @@ against---the key thing being that the command resulted in the
 [changed] status, meaning that it ran successfully and that the
 service was indeed restarted:
 
+
 ```
 frt01.example.com | CHANGED => {
     "ansible_facts": {
@@ -347,17 +327,9 @@ frt01.example.com | CHANGED => {
     "state": "started",
 ```
 
-You could create and execute a series of ad hoc commands to replicate
-the six shell commands given in the preceding and run them all
-individually. With a bit of cleverness, you should reduce this from six
-commands (for example, the Ansible [service] module can both
-enable a service at boot time and restart it in one ad hoc command).
-However, you would still ultimately end up with at least three or four
-ad hoc commands, and if you want to run these again later on another
-server, you will need to refer to your notes to figure out how you did
-it. 
 
-A playbook is hence a far more valuable way to approach this---not only
+
+A playbook is a far more valuable way to approach this---not only
 will it perform all of the steps in one go, but it will also give you a
 record of how it was done for you to refer to later on. There are
 multiple ways to do this, but consider the following as an example:
@@ -374,15 +346,6 @@ multiple ways to do this, but consider the following as an example:
       apt:
         name: apache2
         state: latest
-    - name: Open firewall for Apache
-      firewalld:
-        service: "{{ item }}"
-        permanent: yes
-        state: enabled
-        immediate: yes
-      loop:
-        - "http"
-        - "https"
     - name: Restart and enable the service
       service:
         name: apache2
@@ -402,10 +365,6 @@ PLAY [Install Apache] **********************************************************
 
 TASK [Install Apache package] **************************************************
 changed: [frt01.example.com]
-
-TASK [Open firewall for Apache] ************************************************
-changed: [frt01.example.com] => (item=http)
-changed: [frt01.example.com] => (item=https)
 
 TASK [Restart and enable the service] ******************************************
 changed: [frt01.example.com]
@@ -427,19 +386,7 @@ meanings: **plays** and **tasks**.
 Defining plays and tasks
 ------------------------
 
-So far when we have worked with playbooks, we have been creating one
-single play per playbook (which logically is the minimum you can do).
-However, you can have more than one play in a playbook, and a \"play\"
-in Ansible terms is simply a set of tasks (and roles, handlers, and
-other Ansible facets) associated with a host (or group of hosts). A task
-is the smallest possible element of a play and is responsible for
-running a single module with a set of arguments to achieve a specific
-goal. Of course, in theory, this sounds quite complex, but when backed
-up by a practical example, it becomes quite simple to understand.
-
-If we refer to our example inventory, this describes a simple two-tier
-architecture (we\'ve left out the database tier for now). Now, suppose
-we want to write a single playbook to configure both the frontend
+Suppose we want to write a single playbook to configure both the frontend
 servers and the application servers. We could use two separate playbooks
 to configure the front end and application servers, but this risks
 fragmenting your code and making it difficult to organize. However,
@@ -546,31 +493,11 @@ playbook---you don\'t have to have multiple ones, but it is important to
 be able to develop multi-play playbooks as you will almost certainly
 find them useful as your environment gets more complex.
 
-Playbooks are the lifeblood of Ansible automation---they extend it
-beyond single task/commands (which in themselves are incredibly
-powerful) to a whole series of tasks organized in a logical fashion. As
-you extend your library of playbooks, however, how do you keep your work
-organized? How do you efficiently reuse the same blocks of code? In the
-preceding example, we installed Apache, and this might be a requirement
-on a number of your servers. However, should you attempt to manage them
-all from one playbook? Or should you perhaps keep copying and pasting
-the same block of code over and over again? There is a better way, and
-in Ansible terms, we need to start looking at roles, which we shall do
-in the very next section.
 
 
 Understanding roles -- the playbook organizer
 =============================================
 
-Roles are designed to enable you to efficiently and effectively reuse
-Ansible code. They always follow a known structure and often will
-include sensible default values for variables, error handling, handlers,
-and so on. Taking our Apache installation example from the previous
-lab, we know that this is something that we might want to do over
-and over again, perhaps with a different configuration file each time,
-and perhaps with a few other tweaks on a per-server (or per inventory
-group) basis. In Ansible, the most efficient way to support the reuse of
-this code in this way would be to create it as a role.
 
 The process of creating roles is in fact very simple---Ansible will (by
 default) look within the same directory as you are running your playbook
@@ -607,40 +534,6 @@ roles/
      meta/
 ```
 
-The preceding directory structure shows two roles defined in our
-hypothetical playbook directory, called [installapache] and
-[installtomcat]. Within each of these directories, you will notice
-a series of subdirectories. These subdirectories do not need to exist
-(more on what they mean in a minute, but for example, if your role has
-no handlers, then [handlers/] does not need to be created).
-However, where you do require such a directory, you should populate it
-with a YAML file named [main.yml]. Each of these [main.yml]
-files will be expected to have certain contents, depending on the
-directory that contained them. 
-
-The subdirectories that can exist inside of a role are as follows:
-
--   [tasks]: This is the most common directory to find in a role,
-    and it contains all of the Ansible tasks that the role should
-    perform.
--   [handlers]: All handlers used in the role should go into this
-    directory.
--   [defaults]: All default variables for the role go in here.
--   [vars]: These are other role variables---these override those
-    declared in the [defaults/] directory as they are higher up
-    the precedence order.
--   [files]: Files needed by the role should go in here---for
-    example, any configuration files that need to be deployed to the
-    target hosts.
-
-
--   [templates]: Distinct from the [files/] directory, this
-    directory should contain all templates used by the role.
--   [meta]: Any metadata needed for the role goes in here. For
-    example, roles are normally executed in the order they are called
-    from the parent playbook---however, sometimes a role will have
-    dependency roles that need to be run first, and if this is the case,
-    they can be declared within this directory.
 
 For the examples we will develop in this part of this lab, we will
 need an inventory, so let\'s reuse the inventory we used in the previous

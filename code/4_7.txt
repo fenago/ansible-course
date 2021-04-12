@@ -9,12 +9,6 @@
       yum:
         name: httpd
         state: latest
-    - name: Open firewall for Apache
-      firewalld:
-        service: "{{ item }}"
-        permanent: yes
-        state: enabled
-        immediate: yes
       loop:
         - "http"
         - "https"

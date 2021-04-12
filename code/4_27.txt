@@ -1,0 +1,35 @@
+$ ansible-playbook -i hosts loop3.yml
+
+PLAY [Simple loop demo play] ***************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [frt01.example.com]
+
+TASK [Echo a value from the loop] **********************************************
+skipping: [frt01.example.com] => (item=1)
+skipping: [frt01.example.com] => (item=2)
+skipping: [frt01.example.com] => (item=3)
+changed: [frt01.example.com] => (item=4)
+changed: [frt01.example.com] => (item=5)
+changed: [frt01.example.com] => (item=6)
+
+TASK [Print the results from the loop] *****************************************
+ok: [frt01.example.com] => {
+    "loopresult": {
+        "changed": true,
+        "msg": "All items completed",
+        "results": [
+            {
+                "ansible_loop_var": "item",
+                "changed": false,
+                "item": 1,
+                "skip_reason": "Conditional result was False",
+                "skipped": true
+            },
+            {
+                "ansible_loop_var": "item",
+                "changed": false,
+                "item": 2,
+                "skip_reason": "Conditional result was False",
+                "skipped": true
+            },

@@ -1,0 +1,16 @@
+$ ansible-config dump
+ACTION_WARNINGS(default) = True
+AGNOSTIC_BECOME_PROMPT(default) = True
+ALLOW_WORLD_READABLE_TMPFILES(default) = False
+ANSIBLE_CONNECTION_PATH(default) = None
+ANSIBLE_COW_PATH(default) = None
+ANSIBLE_COW_SELECTION(default) = default
+ANSIBLE_COW_WHITELIST(default) = ['bud-frogs', 'bunny', 'cheese', 'daemon', 'default', 'dragon', 'elephant-in-snake', 'elephant', 'eyes', 'hellokitty', 'kitty', 'luke-koala', 'meow', 'milk', 'moofasa', 'moose', 'ren', 'sheep', 'small', 'stegosaurus', 'stimpy', 'supermilker', 'three-eyes', 'turkey', 'turtle', 'tux', 'udder', 'vader-koala', 'vader', 'www']
+ANSIBLE_FORCE_COLOR(default) = False
+ANSIBLE_NOCOLOR(default) = False
+ANSIBLE_NOCOWS(default) = False
+ANSIBLE_PIPELINING(default) = False
+ANSIBLE_SSH_ARGS(default) = -C -o ControlMaster=auto -o ControlPersist=60s
+ANSIBLE_SSH_CONTROL_PATH(default) = None
+ANSIBLE_SSH_CONTROL_PATH_DIR(default) = ~/.ansible/cp
+....

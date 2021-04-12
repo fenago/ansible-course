@@ -1,0 +1,7 @@
+PLAY [all] ****************************************************************************************
+
+TASK [Gathering Facts] ****************************************************************************
+fatal: [host.example.com]: UNREACHABLE! => {"changed": false, "msg": "Failed to connect to the host via ssh: ssh: Could not resolve hostname host.example.com: Name or service not known", "unreachable": true}
+
+PLAY RECAP ****************************************************************************************
+host.example.com : ok=0 changed=0 unreachable=1 failed=0 skipped=0 rescued=0 ignored=0 

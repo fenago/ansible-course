@@ -1,0 +1,14 @@
+$ ansible-playbook -i localhost, redis-playbook.yml
+
+PLAY [Display redis variables] *************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [localhost]
+
+TASK [Display the redis port] **************************************************
+ok: [localhost] => {
+    "msg": "The redis port for cacheserver01.example.com is 6379"
+}
+
+PLAY RECAP *********************************************************************
+localhost : ok=2 changed=0 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0

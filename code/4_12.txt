@@ -1,0 +1,22 @@
+.
+├── hosts
+├── roles
+│   ├── linuxtype
+│   │   └── meta
+│   │       └── main.yml
+│   ├── network
+│   │   ├── meta
+│   │   │   └── main.yml
+│   │   └── tasks
+│   │       └── main.yml
+│   ├── platform
+│   │   └── meta
+│   │       └── main.yml
+│   └── version
+│       ├── meta
+│       │   └── main.yml
+│       └── tasks
+│           └── main.yml
+└── site.yml
+
+11 directories, 8 files

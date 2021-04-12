@@ -1,0 +1,21 @@
+$ ansible -i production-inventory frontends_emea_zone -B 7200 -P 0 -a "sleep 2h"
+frontend1-emea.example.com | CHANGED => {
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python"
+    },
+    "ansible_job_id": "537978889103.8857",
+    "changed": true,
+    "finished": 0,
+    "results_file": "/root/.ansible_async/537978889103.8857",
+    "started": 1
+}
+frontend2-emea.example.com | CHANGED => {
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python"
+    },
+    "ansible_job_id": "651461662130.8858",
+    "changed": true,
+    "finished": 0,
+    "results_file": "/root/.ansible_async/651461662130.8858",
+    "started": 1
+}

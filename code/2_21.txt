@@ -1,0 +1,9 @@
+$ ansible -i production-inventory frontends_emea_zone -a /usr/sbin/pvs -u danieloh --become --ask-become-pass
+BECOME password:
+
+frontend1-emea.example.com | CHANGED | rc=0 >>
+  PV VG Fmt Attr PSize PFree
+  /dev/sda2 centos lvm2 a-- <19.00g 0
+frontend2-emea.example.com | CHANGED | rc=0 >>
+  PV VG Fmt Attr PSize PFree
+  /dev/sda2 centos lvm2 a-- <19.00g 0

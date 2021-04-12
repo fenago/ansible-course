@@ -1,0 +1,35 @@
+$ ansible-playbook -i hosts playandtask.yml
+
+PLAY [Play 1 - configure the frontend servers] *********************************
+
+TASK [Gathering Facts] *********************************************************
+changed: [frt02.example.com]
+changed: [frt01.example.com]
+
+TASK [Install the Apache package] *********************************************
+changed: [frt01.example.com]
+changed: [frt02.example.com]
+
+TASK [Start the Apache server] *************************************************
+changed: [frt01.example.com]
+changed: [frt02.example.com]
+
+PLAY [Play 2 - configure the application servers] *******************************
+
+TASK [Gathering Facts] *********************************************************
+changed: [app01.example.com]
+changed: [app02.example.com]
+
+TASK [Install Tomcat] **********************************************************
+changed: [app02.example.com]
+changed: [app01.example.com]
+
+TASK [Start the Tomcat server] *************************************************
+changed: [app02.example.com]
+changed: [app01.example.com]
+
+PLAY RECAP *********************************************************************
+app01.example.com : ok=3 changed=2 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0
+app02.example.com : ok=3 changed=2 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0
+frt01.example.com : ok=3 changed=2 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0
+frt02.example.com : ok=3 changed=2 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0

@@ -1,0 +1,10 @@
+$ ansible webservers -m ping 
+web1.example.com | SUCCESS => {
+    "changed": false, 
+    "ping": "pong"
+}
+web2.example.com | SUCCESS => {
+    "changed": false, 
+    "ping": "pong"
+}
+$

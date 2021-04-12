@@ -1,0 +1,21 @@
+$ PLAY [My first Ansible playbook] ***********************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [remote2.example.com]
+ok: [remote1.example.com]
+ok: [remote3.example.com]
+
+TASK [Update the latest of an Apache Web Server] *******************************
+changed: [remote2.example.com]
+changed: [remote3.example.com]
+changed: [remote1.example.com]
+
+RUNNING HANDLER [Restart an Apache Web Server] *********************************
+changed: [remote3.example.com]
+changed: [remote1.example.com]
+changed: [remote2.example.com]
+
+PLAY RECAP *********************************************************************
+remote1.example.com : ok=3 changed=2 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0
+remote2.example.com : ok=3 changed=2 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0
+remote3.example.com : ok=3 changed=2 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0

@@ -1,0 +1,17 @@
+$ ansible-playbook -i hosts loop2.yml
+
+PLAY [Simple loop demo play] ***************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [frt01.example.com]
+
+TASK [Echo a value from the loop] **********************************************
+skipping: [frt01.example.com] => (item=1)
+skipping: [frt01.example.com] => (item=2)
+skipping: [frt01.example.com] => (item=3)
+changed: [frt01.example.com] => (item=4)
+changed: [frt01.example.com] => (item=5)
+changed: [frt01.example.com] => (item=6)
+
+PLAY RECAP *********************************************************************
+frt01.example.com : ok=2 changed=1 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0

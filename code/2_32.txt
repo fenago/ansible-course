@@ -1,0 +1,19 @@
+$ ansible-playbook -i localhost, jinja2-filtering2.yml
+[WARNING]: Found variable using reserved name: tags
+
+PLAY [Jinja2 filtering demo 2] *************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [localhost]
+
+TASK [debug] *******************************************************************
+ok: [localhost] => {
+    "msg": {
+        "job": "developer",
+---
+        "language": "java"
+    }
+}
+
+PLAY RECAP *********************************************************************
+localhost : ok=2 changed=0 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0

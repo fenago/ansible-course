@@ -1,0 +1,12 @@
+PLAY [Simple play to demonstrate conditional on Cumulus Linux] ***************************************************************
+
+TASK [Gathering Facts] 
+***************************************************************
+ok: [vx01.example.com]
+
+TASK [Enable swp2 if it is disabled] ***************************************************************
+skipping: [vx01.example.com]
+
+PLAY RECAP
+***************************************************************
+vx01.example.com : ok=1 changed=0 unreachable=0 failed=0 skipped=1 rescued=0 ignored=0

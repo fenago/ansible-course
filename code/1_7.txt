@@ -1,0 +1,12 @@
+# test out HTTP
+winrs -r:http://<server address>:5985/wsman -u:Username -p:Password ipconfig
+
+# test out HTTPS (will fail if the cert is not verifiable)
+winrs -r:https://<server address>:5986/wsman -u:Username -p:Password -ssl ipconfig 
+# test out HTTPS, ignoring certificate verification
+$username = "Username"
+$password = ConvertTo-SecureString -String "Password" -AsPlainText -Force
+$cred = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $username, $password
+
+$session_option = New-PSSessionOption -SkipCACheck -SkipCNCheck -SkipRevocationCheck
+Invoke-Command -ComputerName server -UseSSL -ScriptBlock { ipconfig } -Credential $cred -SessionOption $session_option

@@ -1,0 +1,49 @@
+$ ansible-playbook loopmain.yml
+[WARNING]: provided hosts list is empty, only localhost is available. Note that
+the implicit localhost does not match 'all'
+
+PLAY [Play to demonstrate nested loops] ****************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [localhost]
+
+TASK [Outer loop] **************************************************************
+included: /root/Practical-Ansible-2/Chapter 4/loopsubtask.yml for localhost
+included: /root/Practical-Ansible-2/Chapter 4/loopsubtask.yml for localhost
+included: /root/Practical-Ansible-2/Chapter 4/loopsubtask.yml for localhost
+
+TASK [Inner loop] **************************************************************
+ok: [localhost] => (item=100) => {
+    "msg": "second item=a first item=100"
+}
+ok: [localhost] => (item=200) => {
+    "msg": "second item=a first item=200"
+}
+ok: [localhost] => (item=300) => {
+    "msg": "second item=a first item=300"
+}
+
+TASK [Inner loop] **************************************************************
+ok: [localhost] => (item=100) => {
+    "msg": "second item=b first item=100"
+}
+ok: [localhost] => (item=200) => {
+    "msg": "second item=b first item=200"
+}
+ok: [localhost] => (item=300) => {
+    "msg": "second item=b first item=300"
+}
+
+TASK [Inner loop] **************************************************************
+ok: [localhost] => (item=100) => {
+    "msg": "second item=c first item=100"
+}
+ok: [localhost] => (item=200) => {
+    "msg": "second item=c first item=200"
+}
+ok: [localhost] => (item=300) => {
+    "msg": "second item=c first item=300"
+}
+
+PLAY RECAP *********************************************************************
+localhost : ok=7 changed=0 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0

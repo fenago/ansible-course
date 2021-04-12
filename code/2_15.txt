@@ -1,0 +1,30 @@
+$ ansible-config list
+ACTION_WARNINGS:
+  default: true
+  description:
+  - By default Ansible will issue a warning when received from a task action (module
+    or action plugin)
+  - These warnings can be silenced by adjusting this setting to False.
+  env:
+  - name: ANSIBLE_ACTION_WARNINGS
+  ini:
+  - key: action_warnings
+    section: defaults
+  name: Toggle action warnings
+  type: boolean
+  version_added: '2.5'
+AGNOSTIC_BECOME_PROMPT:
+  default: true
+  description: Display an agnostic become prompt instead of displaying a prompt containing
+    the command line supplied become method
+  env:
+  - name: ANSIBLE_AGNOSTIC_BECOME_PROMPT
+  ini:
+  - key: agnostic_become_prompt
+    section: privilege_escalation
+  name: Display an agnostic become prompt
+  type: boolean
+  version_added: '2.5'
+  yaml:
+    key: privilege_escalation.agnostic_become_prompt
+.....

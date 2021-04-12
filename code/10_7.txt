@@ -1,0 +1,22 @@
+PLAY [all] ****************************************************************************************
+
+TASK [Gathering Facts] ****************************************************************************
+ok: [host1.example.com]
+ok: [host3.example.com]
+ok: [host2.example.com]
+
+TASK [debug] **************************************************************************************
+ok: [host1.example.com] => {
+    "msg": "Hello, World!"
+}
+ok: [host2.example.com] => {
+    "msg": "Hello, World!"
+}
+ok: [host3.example.com] => {
+    "msg": "Hello, World!"
+}
+
+PLAY RECAP ****************************************************************************************
+host1.example.com : ok=2 changed=0 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0 
+host2.example.com : ok=2 changed=0 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0 
+host3.example.com : ok=2 changed=0 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0 

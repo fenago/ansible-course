@@ -1,0 +1,17 @@
+$ ansible-playbook condition3.yml
+[WARNING]: provided hosts list is empty, only localhost is available. Note that
+the implicit localhost does not match 'all'
+
+PLAY [Play to patch only CentOS systems] ***************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [localhost]
+
+TASK [Gather directory listing from local system] ******************************
+changed: [localhost]
+
+TASK [Alert if we find a hosts file] *******************************************
+skipping: [localhost]
+
+PLAY RECAP *********************************************************************
+localhost : ok=2 changed=1 unreachable=0 failed=0 skipped=1 rescued=0 ignored=0

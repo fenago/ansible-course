@@ -1,0 +1,12 @@
+$ ansible-playbook -i hosts handlers1.yml
+
+PLAY [Handler demo 1] **********************************************************
+
+TASK [Update Apache configuration] *********************************************
+changed: [frt01.example.com]
+
+RUNNING HANDLER [Restart Apache] ***********************************************
+changed: [frt01.example.com]
+
+PLAY RECAP *********************************************************************
+frt01.example.com : ok=2 changed=2 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0

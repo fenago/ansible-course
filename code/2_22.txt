@@ -1,0 +1,35 @@
+$ ansible -i production-inventory frontends_emea_zone -m copy -a "src=/etc/yum.conf dest=/tmp/yum.conf"
+frontend1-emea.example.com | CHANGED => {
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python"
+    },
+    "changed": true,
+    "checksum": "e0637e631f4ab0aaebef1a6b8822a36f031f332e",
+    "dest": "/tmp/yum.conf",
+    "gid": 0,
+    "group": "root",
+    "md5sum": "a7dc0d7b8902e9c8c096c93eb431d19e",
+    "mode": "0644",
+    "owner": "root",
+    "size": 970,
+    "src": "/root/.ansible/tmp/ansible-tmp-1586110004.75-208447517347027/source",
+    "state": "file",
+    "uid": 0
+}
+frontend2-emea.example.com | CHANGED => {
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python"
+    },
+    "changed": true,
+    "checksum": "e0637e631f4ab0aaebef1a6b8822a36f031f332e",
+    "dest": "/tmp/yum.conf",
+    "gid": 0,
+    "group": "root",
+    "md5sum": "a7dc0d7b8902e9c8c096c93eb431d19e",
+    "mode": "0644",
+    "owner": "root",
+    "size": 970,
+    "src": "/root/.ansible/tmp/ansible-tmp-1586110004.75-208447517347027/source",
+    "state": "file",
+    "uid": 0
+}

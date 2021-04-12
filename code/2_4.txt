@@ -1,0 +1,13 @@
+$ ansible all -i hosts -m ping
+frontend.example.com | SUCCESS => {
+    "changed": false, 
+    "ping": "pong"
+}
+backend1.example.com | SUCCESS => {
+    "changed": false, 
+    "ping": "pong"
+}
+backend2.example.com | SUCCESS => {
+    "changed": false, 
+    "ping": "pong"
+}

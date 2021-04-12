@@ -1,0 +1,21 @@
+$ ansible-playbook -i hostgroups-children-ini site.yml --limit frontends:apps
+
+PLAY [A simple playbook for demonstrating inventory patterns] ******************
+
+TASK [Gathering Facts] *********************************************************
+ok: [frt02.example.com]
+ok: [app01.example.com]
+ok: [frt01.example.com]
+ok: [app02.example.com]
+
+TASK [Ping each host] **********************************************************
+ok: [app01.example.com]
+ok: [app02.example.com]
+ok: [frt02.example.com]
+ok: [frt01.example.com]
+
+PLAY RECAP *********************************************************************
+app01.example.com : ok=2 changed=0 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0
+app02.example.com : ok=2 changed=0 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0
+frt01.example.com : ok=2 changed=0 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0
+frt02.example.com : ok=2 changed=0 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0

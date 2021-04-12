@@ -1,0 +1,27 @@
+$ ansible-playbook -i hosts site.yml
+
+PLAY [Install Apache using a role] *********************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [frt01.example.com]
+ok: [frt02.example.com]
+
+TASK [installapache : Install Apache using yum] ********************************
+changed: [frt02.example.com]
+changed: [frt01.example.com]
+
+TASK [installapache : Start the Apache server] *********************************
+changed: [frt01.example.com]
+changed: [frt02.example.com]
+
+TASK [installapache : Install Apache using apt] ********************************
+skipping: [frt01.example.com]
+skipping: [frt02.example.com]
+
+TASK [installapache : Start the Apache server] *********************************
+skipping: [frt01.example.com]
+skipping: [frt02.example.com]
+
+PLAY RECAP *********************************************************************
+frt01.example.com : ok=3 changed=2 unreachable=0 failed=0 skipped=2 rescued=0 ignored=0
+frt02.example.com : ok=3 changed=2 unreachable=0 failed=0 skipped=2 rescued=0 ignored=0

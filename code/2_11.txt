@@ -1,0 +1,15 @@
+$ ansible-playbook -i production-inventory frontends-na.yml
+
+PLAY [frontends_na_zone] *******************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [frontend1-na.example.com]
+ok: [frontend2-na.example.com]
+
+TASK [simple connection test] **************************************************
+ok: [frontend1-na.example.com]
+ok: [frontend2-na.example.com]
+
+PLAY RECAP *********************************************************************
+frontend1-na.example.com : ok=2 changed=0 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0
+frontend2-na.example.com : ok=2 changed=0 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0

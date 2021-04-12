@@ -632,14 +632,6 @@ $ mkdir -p roles/installapache/tasks
     state: started
 ```
 
-For now, we\'re keeping our role code really simple---however, you can
-see that the preceding tasks files are just like an Ansible playbook,
-except that they lack the play definition. As they do not come under a
-play, they are also at a lower indentation level than in a playbook, but
-apart from this difference, the code should look very familiar to you.
-In fact, this is part of the beauty of roles: as long as you pay
-attention to getting the indentation level right, you can more or less
-use the same code in a playbook or a role.
 
 Now, roles don\'t run by themselves---we have to create a playbook to
 call them, so let\'s write a simple playbook to call our newly created
@@ -677,6 +669,7 @@ using [ansible-playbook] in the normal way---you should see output
 similar to this:
 
 ```
+$ cd ~/Desktop/ansible-course/Lab_4/role-example1
 $ ansible-playbook -i hosts site.yml
 
 PLAY [Install Apache using a role] *********************************************
@@ -706,12 +699,8 @@ frt01.example.com : ok=3 changed=2 unreachable=0 failed=0 skipped=2 rescued=0 ig
 frt02.example.com : ok=3 changed=2 unreachable=0 failed=0 skipped=2 rescued=0 ignored=0
 ```
 
-That\'s it---you have created, at the simplest possible level, your
-first role. Of course (as we discussed earlier), there is much more to a
-role than just simple tasks as we have added here, and we will see
-expanded examples as we work through this lab. However, the
-preceding example is intended to show you how quick and easy it is to
-get started with roles.
+<span style="color:red;">Since we have added hosts in `/etc/hosts` with `127.0.0.1` address so they are pointing to same machine, we might apt get locking error which can be ignored. This error won't occur using multiple machines</span>
+
 
 Before we look at some of the other aspects relating to roles, let\'s
 take a look at some other ways to call your role. Ansible allows you to
@@ -741,12 +730,6 @@ similar manner as in the preceding example:
 Setting up role-based variables and dependencies
 ------------------------------------------------
 
-Variables are at the heart of making Ansible playbooks and roles
-reusable, as they allow the same code to be repurposed with slightly
-different values or configuration data. The Ansible role directory
-structure allows for role-specific variables to be declared in two
-locations. Although, at first, the difference between these two
-locations may not seem obvious, it is of fundamental importance.
 
 Roles based variables can go in one of two locations:
 
@@ -754,23 +737,12 @@ Roles based variables can go in one of two locations:
 -   [vars/main.yml]
 
 
-In addition to the role-based variables described previously, there is
-also the option to add metadata to a role using the [meta/]
-directory. As before, to make use of this, simply add a file
-called [main.yml] into this directory. To explain how you might
-make use of the [meta/] directory, let\'s build and run a
-practical example that will show how it can be used. Before we get
-started though, it is important to note that, by default, the Ansible
-parser will only allow you to run a role once. This is somewhat similar
-to the way in which we discussed handlers earlier, which can be called
-multiple times but ultimately are only run once at the end of the play.
-Roles are the same in that they can be or referred to multiple times but
-will only actually get run once. There are two exceptions to this---the
-first is if the role is called more than once but with different
-variables or parameters, and the other is if the role being called has
-[allow\_duplicates] set to [true] in its
-[meta/] directory. We shall see examples of both of these as we
-build our example:
+**Note:** Complete example is available at:
+
+`cd ~/Desktop/ansible-course/Lab_4/role-example2` 
+
+
+We shall see examples of both of these as we build our example:
 
 1.  At the top level of our practical example, we will have a copy of
     the same inventory we have been using throughout this lab. We
@@ -977,29 +949,7 @@ PLAY RECAP *********************************************************************
 frt01.example.com : ok=5 changed=0 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0
 ```
 
-What happened? Although we see that the [network] and
-[version] roles are called twice (as expected), the value of the
-[type] variable is always [ubuntu]. This highlights an
-important point about the way the Ansible parser works and the
-difference between static imports (which we are doing here) and dynamic
-includes (which we discussed in the previous section). 
-
-With static imports, role variables are scoped as if they were defined
-at the play level rather than the role level. The roles themselves are
-all parsed and merged into the play we created in our [site.yml]
-playbook at parsing time---hence, the Ansible parser creates (in memory)
-one big playbook that contains all of the merged variable and role
-content from our directory structure. There is nothing wrong with doing
-this, but what it means is that the [type] variable gets
-overwritten each time it is declared, and so the last value we declare
-(which, in this case, was [ubuntu]) is the value that gets used
-for the playbook run.
-
-So, how do we get this playbook to run as we originally intended---to
-load our dependent roles but with the two different values we defined
-for the [type] variable?
-
-The answer to this question is if we are to continue using statically
+If we are to continue using statically
 imported roles, then we should not use role variables when we declare
 the dependencies. Instead, we should pass over [type] as a role
 parameter. This is a small but crucial difference---role parameters
@@ -1111,6 +1061,7 @@ undertaking in this lab, as in this example:
 
 ```
 $ ansible-galaxy role init --init-path roles/ testrole
+
 - Role testrole was created successfully
 $ tree roles/testrole/
 roles/testrole/
@@ -1195,6 +1146,8 @@ Now, when we run this task, if your test system(s) are Ubuntu-based (and
 mine are), you should see output similar to the following:
 
 ```
+
+$ cd ~/Desktop/ansible-course/Lab_4
 $ ansible-playbook -i hosts condition.yml
 
 PLAY [Play to patch only CentOS systems] ***************************************
@@ -1263,20 +1216,12 @@ skipping: [frt02.example.com]
 skipping: [app02.example.com]
 
 PLAY RECAP *********************************************************************
-app01.example.com : ok=2 changed=1 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0
-app02.example.com : ok=1 changed=0 unreachable=0 failed=0 skipped=1 rescued=0 ignored=0
-frt01.example.com : ok=1 changed=0 unreachable=0 failed=0 skipped=1 rescued=0 ignored=0
-frt02.example.com : ok=1 changed=0 unreachable=0 failed=0 skipped=1 rescued=0 ignored=0
+app01.example.com   : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+app02.example.com   : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+frt01.example.com   : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+frt02.example.com   : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
 ```
 
-Of course, this conditional logic is not limited to Ansible facts and
-can be incredibly valuable when using the [shell] or
-[command] modules. When you run any Ansible module (be it
-[shell], [command], [apt], [copy], or
-otherwise), the module returns data detailing the results of its run.
-You can capture this in a standard Ansible variable using the
-[register] keyword and then process it further later on in the
-playbook.
 
 Consider the following playbook code. It contains two tasks, the first
 of which is to obtain the listing of the current directory and capture
@@ -1309,6 +1254,7 @@ following:
 
 ```
 $ ansible-playbook condition3.yml
+
 [WARNING]: provided hosts list is empty, only localhost is available. Note that
 the implicit localhost does not match 'all'
 
@@ -1329,11 +1275,12 @@ PLAY RECAP *********************************************************************
 localhost : ok=3 changed=1 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0
 ```
 
-Yet, if the file doesn\'t exist, then you\'ll see that the [debug]
-message gets skipped:
+Yet, if the file doesn\'t exist, then you\'ll see that the [debug] message gets skipped:
 
 ```
 $ ansible-playbook condition3.yml
+
+
 [WARNING]: provided hosts list is empty, only localhost is available. Note that
 the implicit localhost does not match 'all'
 
@@ -1602,18 +1549,7 @@ we can clearly see that the first two items in the list were
 [skipped] because the result of our [when] clause
 ([Conditional]) was [false].
 
-Hence, we can see so far that loops are easy to define and work
-with---but you may be asking, *can you create nested loops?* The answer
-to that question is *yes*, but there is a catch---the special variable
-named [item] would clash as both the inner and outer loops would
-use the same variable name. This would mean the results from your nested
-loop run would be, at best, unexpected.
 
-Fortunately, there is a [loop] parameter called
-[loop\_control], which allows you to change the name of the
-special variable containing the data from the current [loop]
-iteration from [item] to something of your choosing. Let\'s create
-a nested loop to see how this works. 
 
 First of all, we\'ll create a playbook in the usual manner, with a
 single task to run in a loop. To generate our nested loop, we\'ll use
@@ -1664,8 +1600,8 @@ clash, all works exactly as we would expect:
 
 ```
 $ ansible-playbook loopmain.yml
-[WARNING]: provided hosts list is empty, only localhost is available. Note that
-the implicit localhost does not match 'all'
+
+
 
 PLAY [Play to demonstrate nested loops] ****************************************
 
@@ -1887,24 +1823,10 @@ Let\'s create a new playbook, this time with the following contents:
 ```
 
 Notice that in the preceding play, we now have additional sections to
-[block]---as well as the tasks in [block] itself, we have
+[block] --- as well as the tasks in [block] itself, we have
 two new parts labeled [rescue] and [always]. The flow of
 execution is as follows:
 
-1.  All tasks in the [block] section are executed normally, in the
-    sequence in which they are listed.
-2.  If a task in the [block] results in an error, no further tasks
-    in the [block] are run:
-    -   Tasks in the [rescue] section start to run in the order
-        they are listed.
-    -   Tasks in the [rescue] section do not run if no errors
-        result from the [block] tasks.
-3.  If an error results from a task being run in the [rescue]
-    section, no further [rescue] tasks are executed and execution
-    moves on to the [always] section.
-4.  Tasks in the [always] section are always run, regardless of
-    any errors in either the [block] or [rescue] sections.
-    They even run when no errors are encountered.
 
 With this flow of execution in mind, you should see output similar to
 the following when you execute this playbook, noting that we have
@@ -1956,47 +1878,12 @@ frt01.example.com : ok=4 changed=0 unreachable=0 failed=1 skipped=0 rescued=1 ig
 frt02.example.com : ok=4 changed=0 unreachable=0 failed=1 skipped=0 rescued=1 ignored=0
 ```
 
-Ansible has two special variables, which contain information you might
-find useful in the rescue block to perform your recovery actions:
 
--   [ansible\_failed\_task]: This is a dictionary containing
-    details of the task from [block] that failed, causing us to
-    enter the [rescue] section. You can explore this by displaying
-    its contents using [debug], but for example, the name of the
-    failing task can be obtained from
-    [ansible\_failed\_task.name]*.*
--   [ansible\_failed\_result]: This is the result of the failed
-    task and behaves the same as if you had added the [register]
-    keyword to the failing task. This saves you having to add
-    [register] to every single task in the block in case it fails.
-
-As your playbooks get more complex and error handling gets more and more
-important (or indeed conditional logic becomes more vital), blocks will
-become an important part of your arsenal in writing good, robust
-playbooks. Let\'s proceed in the next section to explore execution
-strategies to gain further control of your playbook runs.
 
 
 Configuring play execution via strategies
 =========================================
 
-As your playbooks become increasingly complex, it becomes more and more
-important that you have robust ways to debug any issues that might
-arise. For example, is there a way you can check the contents of a given
-variable (or variables) during execution without the need to insert
-[debug] statements throughout your playbook? Similarly, we have so
-far seen that Ansible will ensure that a particular task runs to
-completion on all inventory hosts that it applies to before moving on to
-the next task---is there a way to vary this?
-
-When you are getting started with Ansible, the execution strategy that
-you see by default (and we have seen this so far in every playbook we
-have executed, even though we have not mentioned it by name) is known as
-[linear]. This does exactly what it describes---each task is
-executed in turn on all applicable hosts before the next task is
-started. However, there is another, less commonly used strategy called
-[free], which allows all tasks to be completed as fast as they can
-on each host, without waiting for other hosts.
 
 The most useful strategy when you are starting work with Ansible,
 however, is going to be the [debug] strategy, and this enables
@@ -2050,13 +1937,6 @@ User interrupted execution
 $ 
 ```
 
-
-Notice that the playbook starts executing but fails on the first task
-with an error as the variable is undefined. However, rather than exiting
-back to the shell, it enters an interactive debugger. An exhaustive
-guide to the use of the debugger is beyond the scope of this course, but
-further details are available here if you are interested in
-learning: <https://docs.ansible.com/ansible/latest/user_guide/playbooks_debugger.html>.
 
 To take you through a very simple, practical debugging example, however,
 enter the [p task] command at the prompt---this will cause the
@@ -2119,72 +1999,30 @@ which you can integrate Git source code management into your playbooks.
 
 Using ansible-pull
 ==================
+. 
 
-The [ansible-pull] command is a special feature of Ansible that
-allows you to, all in one go, pull a playbook from a Git repository (for
-example, GitHub) and then execute it, hence saving the usual steps such
-as cloning (or updating the working copy of) the repository, then
-executing the playbook. The great thing about [ansible-pull] is
-that it allows you to centrally store and version control your playbooks
-and then execute them with a single command, hence enabling them to be
-executed using the [cron] scheduler without the need to even
-install the Ansible playbooks on a given box.
 
-An important thing to note, however, is that, while the [ansible]
-and [ansible-playbook] commands can both operate over an entire
-inventory and run the playbooks against one or more remote hosts, the
-[ansible-pull] command is only intended to run the playbooks it
-obtains from your source control system on the localhost. Hence, if you
-want to use [ansible-pull] throughout your infrastructure, you
-must install it onto every host that needs it.
-
-Nonetheless, let\'s see how this might work. We\'ll simply run the
-command by hand to explore its application, but in reality, you would
-almost certainly install it into your [crontab] so that it runs on
-a regular basis, picking up any changes you make to your playbook in the
-version control system. 
-
-As [ansible-pull] is only intended to run the playbook on the
-local system, an inventory file is somewhat redundant---instead, we\'ll
-use a little-used inventory specification whereby you can simply specify
-inventory hosts directory as a comma-separated list on the command line.
-If you only have one host, you simply specify its name followed by a
-comma.
 
 Let\'s use a simple playbook from GitHub that sets the message of the
 day based on variable content. To do this, we will run the following
 command (which we\'ll break down in a minute):
 
 ```
-$ ansible-pull -d /var/ansible-set-motd -i ${HOSTNAME}, -U https://github.com/jamesfreeman959/ansible-set-motd.git site.yml -e "ag_motd_content='MOTD generated by ansible-pull'" >> /tmp/ansible-pull.log 2>&1
+$ ansible-pull -d /var/ansible-set-motd -i ${HOSTNAME}, -U https://github.com/fenago/ansible-set-motd.git site.yml -e "ag_motd_content='MOTD generated by ansible-pull'" >> /tmp/ansible-pull.log 2>&1
 ```
 
-This command breaks down as follows:
-
--   [-d /var/ansible-set-motd]: This sets the working directory
-    that will contain the checkout of the code from GitHub.
--   [-i \${HOSTNAME},]: This runs only on the current host,
-    specified by its hostname from the appropriate shell variable.
--   [-U https://github.com/jamesfreeman959/ansible-set-motd.git]:
-    We use this URL to obtain the playbooks.
--   [site.yml]: This is the name of the playbook to run.
--   [-e \"ag\_motd\_content=\'MOTD generated by ansible-pull\'\"]:
-    This sets the appropriate Ansible variable to generate the MOTD
-    content.
--   [\>\> /tmp/ansible-pull.log 2\>&1]: This redirects the output
-    of the command to a log file in case we need to analyze it
-    later---especially useful if running the command in a [cron
-    job] where the output would never be printed to the user\'s
-    terminal.
 
 When you run this command, you should see some output similar to the
 following (note that log redirection has been removed to make it easier
 to see the output):
 
 ```
-$ ansible-pull -d /var/ansible-set-motd -i ${HOSTNAME}, -U https://github.com/jamesfreeman959/ansible-set-motd.git site.yml -e "ag_motd_content='MOTD generated by ansible-pull'"
+$ ansible-pull -d /var/ansible-set-motd -i ${HOSTNAME}, -U https://github.com/fenago/ansible-set-motd.git site.yml -e "ag_motd_content='MOTD generated by ansible-pull'"
+
+
+
 Starting Ansible Pull at 2020-04-14 17:26:21
-/usr/bin/ansible-pull -d /var/ansible-set-motd -i cookbook, -U https://github.com/jamesfreeman959/ansible-set-motd.git site.yml -e ag_motd_content='MOTD generated by ansible-pull'
+/usr/bin/ansible-pull -d /var/ansible-set-motd -i cookbook, -U https://github.com/fenago/ansible-set-motd.git site.yml -e ag_motd_content='MOTD generated by ansible-pull'
 cookbook |[WARNING]: SUCCESS = Your git > {
     "aversion isfter": "7d too old t3a191ecb2do fully suebe7f84f4fpport the a5817b0f1bdepth argu49c4cd54",ment.
 Fall

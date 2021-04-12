@@ -164,49 +164,13 @@ will depend on what your intended task is.
 
 ![](./images/cff1ffb2-7801-4c9f-ae0d-605181e91ae3.png)
 
-As you can see, the documentation page for each module provides a great
-deal of information, including a longer description. If you scroll down
-the page, you will see a list of the possible arguments that you can
-provide the module with, some practical examples of how to use them, and
-some details about the outputs from the module. Also, note the
-[Requirements] section in the preceding screenshot --
-some modules, especially cloud-related ones, require additional Python
-modules before they will work, and if you attempt to run the
-[aws\_s3] module from a playbook without installing the
-[boto], [boto3], and [botocore] modules on Python 2.6
-or later, you will simply receive an error.
 
-All modules must have documentation like this created before they will
-be accepted as part of the Ansible project, so you must keep this in
-mind if you intend to submit your own modules. This is also one of the
-reasons for Ansible\'s popularity -- with easy-to-maintain and
-well-documented standards, it is the perfect community platform for
-automation. The official Ansible website isn\'t the only place you can
-obtain documentation, however, as it is even available on the command
-line. We shall look at how to retrieve documentation via this route in
-the next section.
 
 
 Accessing module documentation from the command line
 ====================================================
 
-As discussed in the preceding section, the Ansible project prides itself
-on its documentation, and making this documentation readily accessible
-is an important part of the project itself. Now, suppose you are working
-on an Ansible task (in a playbook, role, or even an ad hoc command) and
-you are in a data center environment where you only have access to the
-shell of the machine you are working on. How would you get access to the
-Ansible documentation?
 
-Fortunately, part of the Ansible installation that we have not discussed
-yet is the [ansible-doc] tool, which is installed as standard
-along with the familiar [ansible] and [ansible-playbook]
-executables. The [ansible-doc] command includes a complete
-(text-based) library of documentation for all the modules that ship with
-the version of Ansible you have installed. This means that the very
-information you need in order to work with modules is at your
-fingertips, even if you are in the middle of a data center and without a
-working internet connection!
 
 The following are some examples to show you how to interact with the
 [ansible-doc] tool:
@@ -937,14 +901,6 @@ avoid them.
 Avoiding common pitfalls
 ------------------------
 
-It is vital that your modules are well thought out and handle error
-conditions gracefully -- people are going to rely on your module someday
-to automate a task on perhaps thousands of servers, and so the last
-thing they want is to spend significant amounts of time debugging
-errors, especially trivial ones that could have been trapped or handled
-gracefully. In this section, we\'ll look specifically at error handling
-and ways to do this so that playbooks will still run and exit
-gracefully.
 
 One piece of overall guidance before we get started is that just like
 documentation receives a high degree of attention in Ansible, so should
@@ -983,15 +939,6 @@ lines of code with the following:
        module.fail_json(msg="Failed to copy file")
 ```
 
-This is some incredibly basic exception handling in Python, but what it
-does is allow the code to try the [shutil.copy] task. However, if
-this fails and an exception is raised, rather than exiting with a
-traceback, we exit cleanly using the [module.fail\_json] call.
-This will tell Ansible that the module failed and cleanly sends a
-JSON-formatted error message back. Naturally, we could do a lot to
-improve the error message; for example, we could obtain the exact error
-message from the [shutil] module and pass it back to Ansible, but
-again, this is left as an exercise for you to complete.
 
 Now, when we try and run the module with a non-existent source file, we
 will see the following cleanly formatted JSON output:
@@ -1015,39 +962,13 @@ succeeds:
 
 With this simple change to our code, we can now cleanly and gracefully
 handle the failure of the file copy operation and report something more
-meaningful back to the user rather than using a traceback. Some
-additional pointers for exception handling and processing in your
-modules are as follows: 
-
--   Fail quickly -- don\'t attempt to keep processing after an error.
--   Return the most meaningful possible error messages using the various
-    module JSON return functions.
--   Never return a traceback if there\'s any way you can avoid it.
--   Try making errors meaningful in the context of the module and what
-    it does (for example, for our module, [File copy error] is
-    more meaningful than [File error] -- and I think you\'ll
-    easily come up with even better error messages).
--   Don\'t bombard the user with errors; instead, try to focus on
-    reporting the most meaningful ones, especially when your module code
-    is complex.
-
-That completes our brief yet practical look at error handling in Ansible
-modules. In the next section, we shall return to the documentation we
-included in our module, including how to build it into HTML
-documentation so that it can go on the Ansible website (and indeed, if
-your module gets accepted into the Ansible source code, this is exactly
-how the web documentation will be generated).
+meaningful back to the user rather than using a traceback.
 
 
 
 Testing and documenting your module
 -----------------------------------
 
-We have already put a great deal of work into documenting our module, as
-we discussed earlier in this lab. However, how can we see it, and
-how can we check that it compiles correctly into the HTML that would go
-on the Ansible website if it were accepted as part of the Ansible source
-code?
 
 Before we get into actually viewing our documentation, we should make
 use of a tool called [ansible-test], which was newly added in the
@@ -1180,21 +1101,6 @@ $ cd docs/docsite/
 $ MODULES=hello_module make webdocs
 ```
 
-Now, in theory, making the Ansible documentation should be this simple;
-however, unfortunately, at the time of writing, the source code for
-Ansible v2.9.6 refuses to build [webdocs]. This will no doubt be
-fixed in due course as, at the time of writing, the documentation build
-scripts are being ported to Python 3. To get the [make webdocs]
-command to run at all, I had to clone the source code for Ansible
-v2.8.10 as a starting point.
-
-Even in this environment, on CentOS 7, the [make webdocs] command
-fails unless you have some very specific Python 3 requirements in place.
-These are not well-documented, but from testing, I can tell you that
-Sphinx v2.4.4 works. The version supplied with CentOS 7 is too old and
-fails, while the newest version available from the Python module
-repositories (v3.0.1, at the time of writing) is not compatible with the
-build process and fails.
 
 Once I\'d started working from the Ansible v2.8.10 source tree, I had to
 make sure I had removed any preexisting [sphinx] modules from my
@@ -1255,85 +1161,9 @@ quality standards.
 
 
 
-More information on building the documentation locally is provided
-here: <https://docs.ansible.com/ansible/latest/community/documentation_contributions.html#building-the-documentation-locally>.
-Although this is an excellent document, it does not currently reflect
-the compatibility issues around Sphinx, nor the build issues regarding
-Ansible 2.9. Hopefully, however, it will give you all of the other
-pointers you need to get going with your documentation.
-
-
-The current process of building the documentation is currently a little
-fussy around the environments that are supported; however, hopefully,
-this is something that will be resolved in due course. In the meantime,
-the process outlined in this section has given you a tested and working
-process to start from.
-
-
-
-The module checklist
---------------------
-
-In addition to the pointers and good practices that we have covered so
-far, there are a few more things you should adhere to in your module
-code to produce something that will be considered of a high standard for
-potential inclusion with Ansible. The following list is not exhaustive
-but will give you a good idea of the practices you should adhere to as a
-module developer:
-
--   Test your modules as much as you can, both in cases that will
-    succeed and in those that cause errors. You can test them using JSON
-    data, as we did in this lab, or make use of them within a test
-    playbook.
--   Try and keep your Python requirements to a minimum. Sometimes, there
-    is no way to avoid the need for additional Python dependencies (such
-    as the [boto] requirements of the AWS-specific modules), but
-    in general, the less you can use, the better. 
--   Don\'t cache data for your module -- the execution strategies of
-    Ansible across differing hosts mean you are unlikely to get good
-    results from doing this. Expect to gather all of the data you need
-    on each run.
--   Modules should be a single Python file -- they shouldn\'t be
-    distributed across multiple files.
-
-
--   Make sure you investigate and run the Ansible integration tests when
-    you are submitting your module code. More information on these is
-    available here:
-    <https://docs.ansible.com/ansible/latest/dev_guide/testing_integration.html>.
--   Make sure you include exception handling at the appropriate points
-    in your module code, as we did in this lab, to prevent issues.
--   Do not use [PSCustomObjects] in Windows modules unless you
-    absolutely cannot avoid it.
-
-Armed with the information you\'ve gained from this lab, you should
-have everything you need to start creating your own modules. You may not
-decide to submit them to the Ansible project, and there is certainly no
-requirement to do so. However, even if you don\'t, following the
-practices outlined in this lab will ensure that you build a good
-quality module, regardless of its intended audience. Finally, on the
-basis that you do want to submit your source code to the Ansible
-project, in the next section, we\'ll look at how to do this through a
-pull request to the Ansible project.
-
-
 
 Contributing upstream -- submitting a GitHub pull request
 ---------------------------------------------------------
-
-When you\'ve worked hard on your module and thoroughly tested and
-documented it, you might feel that it is time to submit it to the
-Ansible project for inclusion. Doing this means creating a pull request
-on the official Ansible repository. Although the intricacies of working
-with GitHub are beyond the scope of this course, we will give you a
-practically focused outline of the basic procedures involved.
-
-
-Following the process outlined here will generate a real request against
-the Ansible project on GitHub so that the code you are committing can be
-merged with their code. *Do not* follow this process unless you
-genuinely have a new module that is ready for submission to the Ansible
-codebase.
 
 
 To submit your module as a pull request of the Ansible repository, you

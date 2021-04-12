@@ -5,10 +5,6 @@ PLAY [Install Apache] **********************************************************
 TASK [Install Apache package] **************************************************
 changed: [frt01.example.com]
 
-TASK [Open firewall for Apache] ************************************************
-changed: [frt01.example.com] => (item=http)
-changed: [frt01.example.com] => (item=https)
-
 TASK [Restart and enable the service] ******************************************
 changed: [frt01.example.com]
 

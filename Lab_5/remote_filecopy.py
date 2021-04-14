@@ -1,7 +1,7 @@
 #!/usr/bin/python 
 # 
 
-# Copyright: (c) 2018, Jesse Keating <jesse.keating@example.org>
+# Copyright: (c) 2021, Fenago <ansible@fenago.org>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 ANSIBLE_METADATA = {'metadata_version': '1.1',
@@ -25,7 +25,7 @@ options:
       - Path to the destination on the remote host for the copy
     required: True
 author:
-- Jesse Keating (@omgjlk)
+- Fenago (@fenago)
 ''' 
 EXAMPLES = '''
    # Example from Ansible Playbooks

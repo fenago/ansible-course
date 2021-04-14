@@ -15,5 +15,5 @@ options:
       - Path to the destination on the remote host for the copy
     required: True
 author:
-- Jesse Keating (@omgjlk)
+- Fenago  (@fenago)
 '''

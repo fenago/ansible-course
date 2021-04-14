@@ -16,7 +16,7 @@ In this lab, we will cover the following topics:
 
 #### Lab Environment
 
-All lab file are present at below path. Run following command in the terminal first before running commands in the lab:
+All lab file are present at below path. Close all terminals and run following command in the **new**  terminal first before running commands in the lab:
 
 `cd ~/Desktop/ansible-course/Lab_6` 
 
@@ -29,26 +29,16 @@ Ansible on your test machine before proceeding further:
 
 ```
 $  ansible-doc --version
+
 ansible-doc 2.9.6
   config file = /etc/ansible/ansible.cfg
-  configured module search path = [u'/root/.ansible/plugins/modules', u'/usr/share/ansible/plugins/modules']
-  ansible python module location = /usr/lib/python2.7/site-packages/ansible
+  configured module search path = ['/root/.ansible/plugins/modules', '/usr/share/ansible/plugins/modules']
+  ansible python module location = /usr/lib/python3/dist-packages/ansible
   executable location = /usr/bin/ansible-doc
-  python version = 2.7.5 (default, Aug 7 2019, 00:51:29) [GCC 4.8.5 20150623 (Red Hat 4.8.5-39)]
+  python version = 3.8.5 (default, Jan 27 2021, 15:41:15) [GCC 9.3.0]
 ```
 
-As much work goes into documenting the plugins as it does in documenting
-the modules, and you will be pleased to know that there is a plugin
-index available
-at <https://docs.ansible.com/ansible/latest/plugins/plugins.html>.
-
-You can also use the [ansible-doc] command as we did before, only
-you need to add the [-t] switch to it, too. Plugins are always
-placed in an appropriate category as their function is radically
-different between categories. If you don\'t specify the [-t]
-switch with [ansible-doc], you end up specifying the [ansible-doc
--t] module, which returns a list of the available modules.
-
+### Exercise
 
 We will leave exploring the plugin documentation on the Ansible website
 as an exercise for you to complete. However, if you want to explore the
@@ -90,7 +80,7 @@ $ ansible-doc -t connection paramiko_ssh
 
 
 ```
-> PARAMIKO (/usr/lib/python2.7/site-packages/ansible/plugins/connection/param
+> PARAMIKO (/usr/lib/python3/dist-packages/ansible/plugins/connection/param
 
         Use the python ssh implementation (Paramiko) to connect to
         targets The paramiko transport is provided because many
@@ -128,13 +118,6 @@ distribution.
 Finding included plugins
 ========================
 
-As we discussed in the preceding section, plugins are not as apparent in
-Ansible as their module counterparts are, and yet we have been using
-them behind the scenes in every single Ansible command we\'ve issued so
-far! Let\'s build on our work in the previous section, where we looked
-at the plugin documentation by looking at where we can find the source
-code for the plugins. This, in turn, will serve as a precursor to us
-building a simple plugin of our own.
 
 If you installed Ansible on a Linux system using a package manager (that
 is, via an RPM or DEB package), then the location of your plugins will
@@ -143,12 +126,10 @@ installed Ansible from the official RPM package, I can see the plugins
 installed here:
 
 ```
-$ ls /usr/lib/python2.7/site-packages/ansible/plugins/
-action    cliconf       httpapi        inventory    lookup     terminal
-become    connection    __init__.py    loader.py    netconf    test
-cache     doc_fragments __init__.pyc   loader.pyc   shell      vars
-callback  filter        __init__.pyo   loader.pyo   strategy
+$ find /usr/lib/ -name *ansible*
+$ ls -ltr /usr/lib/python3/dist-packages/ansible/plugins/
 ```
+
 
 Notice how the plugins are separated into subdirectories, all named
 after their categories. If we want to look up the [paramiko\_ssh]
@@ -156,20 +137,19 @@ plugin that we reviewed the documentation of in the preceding section,
 we can look in the [connection/] subdirectory:
 
 ```
-$ ls -l /usr/lib/python2.7/site-packages/ansible/plugins/connection/paramiko_ssh.py
--rw-r--r-- 1 root root 23544 Mar 5 05:39 /usr/lib/python2.7/site-packages/ansible/plugins/connection/paramiko_ssh.py
+$ ls -l /usr/lib/python3/dist-packages/ansible/plugins/connection/paramiko_ssh.py
+
+-rw-r--r-- 1 root root 23544 Mar 5 05:39 /usr/lib/python3/dist-packages/ansible/plugins/connection/paramiko_ssh.py
 ```
 
-However, in general, I do not recommend that you edit or change the
-files installed from a package as you might all too easily overwrite
-them when upgrading the package. As one of our goals in this lab is
-to write our own simple custom plugin, let\'s look at how to find the
+As one of our goals in this lab is to write our own simple custom plugin, let\'s look at how to find the
 plugins in the official Ansible source code:
 
 1.  Clone the official Ansible repository from GitHub, as we did
     previously, and change the directory to the location of your clone:
 
 ```
+$ cd ~ && rm -r ansible     # delete existing clone
 $ git clone https://github.com/ansible/ansible.git
 $ cd ansible
 ```
@@ -197,7 +177,9 @@ looks as follows, with one Python file for each plugin :
 
 ```
 $ ls -al connection/
+
 total 176
+
 drwxr-xr-x 2 root root 109 Apr 15 17:24 .
 drwxr-xr-x 19 root root 297 Apr 15 17:24 ..
 -rw-r--r-- 1 root root 16411 Apr 15 17:24 __init__.py
@@ -254,45 +236,8 @@ practical example, how they are put together.
 Creating custom plugins
 =======================
 
-In this section, we will take you through a practical guide on creating
-your own plugin. The example will be, by necessity, simple. However,
-hopefully, it will serve you well in guiding you in the principles and
-best practices of plugin development and give you a solid foundation to
-build your own more complex plugins. We will even show you how to
-integrate these with your own playbooks and, when you\'re ready, submit
-them to the official Ansible project for inclusion.
 
-As we noted when we built our own module, Ansible is written in Python,
-and its plugins are no exception. As a result, you will need to write
-your plugin in Python; so, to get started on developing your own plugin,
-you will need to make sure you have Python and a few essential tools
-installed. If you already have Ansible running on your development
-machine, you probably have the required packages installed. However, if
-you are starting from scratch, you will need to install Python, the
-Python package manager ([pip]), and perhaps some other development
-packages.
-
--   On Ubuntu, you can run the following commands to install the
-    packages you will need:
-
-```
-$ sudo apt-get update
-$ sudo apt-get install python-pip python-dev build-essential 
-```
-
-
-Once you have installed the required packages, you will need to clone
-the Ansible Git repository to your local machine, as there are some
-valuable scripts in there that we will need later on in the module
-development process. Use the following command to clone the Ansible
-repository to your current directory on your development machine:
-
-```
-$ git clone https://github.com/ansible/ansible.git
-$ cd ansible
-```
-
-
+`cd ~/ansible`
 
 Let\'s get started on creating our simple filter plugin. As we are only
 creating one, it will live in its own single Python file. You could
@@ -312,7 +257,7 @@ Perform the following steps to create and test your plugin code:
     example for you to get started with:
 
 ```
-# (c) 2020, James Freeman <james.freeman@example.com>
+# (c) 2020, Fenago <ansible@fenago.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 ```
 
@@ -386,7 +331,9 @@ all goes well, it should look something like the following:
 
 
 ```
+$ cd ~/Desktop/ansible-course/Lab_6/
 $ ansible-playbook -i hosts myplugin.yml
+
 
 PLAY [Play to demonstrate our custom filter] ***********************************
 
@@ -400,40 +347,14 @@ frt01.example.com : ok=1 changed=0 unreachable=0 failed=0 skipped=0 rescued=0 ig
 ```
 
 
-
 As you can see, our new filter plugin replaced the
-[Puppet] string in our variable\'s contents and replaced it with
-the [Ansible] string. This, of course, is just a silly test and
-not one you are likely to contribute back to the Ansible project.
-However, it shows how, in just six lines of code and with a modicum of
-Python knowledge, we have created our own filter plugin to manipulate a
-string. You could come up with something far more complex and useful,
-I\'m sure!
+[Puppet] string in our variable\'s contents and replaced it with the [Ansible] string.
 
-Other plugin types require more effort than this; although we won\'t go
-through the process of creating a filter plugin here, you\'ll find
-coding a filter plugin more akin to coding a module, as you need to do
-the following:
-
--   Include the [DOCUMENTATION], [EXAMPLES], and
-    [RETURN] sections with the appropriate documentation.
--   Ensure you have incorporated appropriate and sufficient error
-    handling in the plugin.
--   Test it thoroughly, including both the failure and success cases. 
 
 As an example of this, let\'s repeat the preceding process, but to
 create a [lookup] plugin, instead. This plugin will be based
 heavily on a simplified version of the file [lookup] plugin.
-However, we want to adapt our version to return only the first character
-of a file. You could adapt this example to perhaps read the header from
-a file, or you could add arguments to the plugin to allow you to extract
-a substring using character indexes. We will leave this enhancement
-activity as an exercise for you to carry out yourself. Let\'s get
-started! Our new lookup plugin will be called [firstchar], and as
-[lookup] plugins have a one-to-one mapping with their Python
-files, the plugin file will be called [firstchar.py]. (In fact,
-Ansible will use this filename as the name of the plugin---you won\'t
-find a reference to it in the code anywhere!). If you intend to test
+If you intend to test
 this from a playbook, as executed previously, you should create this in
 a directory called [lookup\_plugins/]:
 
@@ -443,8 +364,7 @@ a directory called [lookup\_plugins/]:
     our example, so it is important we include the relevant credit:
 
 ```
-# (c) 2020, James Freeman <james.freeman@example.com>
-# (c) 2012, Daniel Hokka Zakrisson <daniel@hozac.com>
+# (c) 2020, Fenago <ansible@fenago.com>
 # (c) 2017 Ansible Project
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 ```
@@ -464,7 +384,7 @@ __metaclass__ = type
 ```
 DOCUMENTATION = """
     lookup: firstchar
-    author: James Freeman <james.freeman@example.com>
+    author: Fenago <ansible@fenago.com>
     version_added: "2.9"
     short_description: read the first character of file contents
     description:
@@ -622,11 +542,12 @@ For clarity, your final directory structure should look as follows:
 ```
 $ ansible-playbook -i hosts myplugin2.yml
 
+
 PLAY [Play to demonstrate our custom lookup plugin] ****************************
 
 TASK [make a statement] ********************************************************
 ok: [frt01.example.com] => {
-    "msg": "H"
+    "msg": "72"
 }
 
 PLAY RECAP *********************************************************************
@@ -636,12 +557,6 @@ frt01.example.com : ok=1 changed=0 unreachable=0 failed=0 skipped=0 rescued=0 ig
 If all goes well, your playbook should return the first character of the
 text file you created. Naturally, there is a lot we could do to enhance
 this code, but this serves as a nice, simple example to get you started.
-
-With this foundation in place, you should now have a reasonable idea of
-how to get started with writing your own plugins for Ansible. The next
-logical step for us is to look in greater depth at how we can test our
-newly written plugins, which we will do in the next section.
-
 
 
 Learning to integrate custom plugins with Ansible source code
@@ -659,8 +574,7 @@ Ansible project source code---for example, by cloning the GitHub
 repository to your local machine:
 
 ```
-$ git clone https://github.com/ansible/ansible.git
-$ cd ansible
+$ cd ~/ansible
 ```
 
 Next, you will need to copy your plugin code into one of the appropriate
@@ -670,7 +584,7 @@ plugin directories.
     directory in the source code you just cloned:
 
 ```
-$ cp ~/custom_filter.py ./lib/ansible/plugins/filter/
+$ cp ~/Desktop/ansible-course/Lab_6/filter_plugins/custom_filter.py ./lib/ansible/plugins/filter/
 ```
 
 2.  Similarly, our custom [lookup] plugin would go in the
@@ -678,9 +592,8 @@ $ cp ~/custom_filter.py ./lib/ansible/plugins/filter/
     following:
 
 ```
-$ cp ~/firstchar.py ./lib/ansible/plugins/lookup/
+$ cp ~/Desktop/ansible-course/Lab_6/lookup_plugins/firstchar.py ./lib/ansible/plugins/lookup/
 ```
-
 
 With your code copied into place, you need to test the documentation
 (that is, whether your plugin includes it) as before. You can build the
@@ -690,56 +603,10 @@ However, as a refresher, we can quickly check whether the documentation
 renders correctly using the [ansible-doc] command, as follows:
 
 
-
 ```
 $ . hacking/env-setup
-running egg_info
-creating lib/ansible.egg-info
-writing requirements to lib/ansible.egg-info/requires.txt
-writing lib/ansible.egg-info/PKG-INFO
-writing top-level names to lib/ansible.egg-info/top_level.txt
-writing dependency_links to lib/ansible.egg-info/dependency_links.txt
-writing manifest file 'lib/ansible.egg-info/SOURCES.txt'
-reading manifest file 'lib/ansible.egg-info/SOURCES.txt'
-reading manifest template 'MANIFEST.in'
-warning: no files found matching 'SYMLINK_CACHE.json'
-writing manifest file 'lib/ansible.egg-info/SOURCES.txt'
-
-Setting up Ansible to run out of checkout...
-
-PATH=/home/james/ansible/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/root/bin
-PYTHONPATH=/home/james/ansible/lib
-MANPATH=/home/james/ansible/docs/man:/usr/local/share/man:/usr/share/man
-
-Remember, you may wish to specify your host file with -i
-
-Done!
-
-$ ansible-doc -t lookup firstchar
-> FIRSTCHAR (/home/james/ansible/lib/ansible/plugins/lookup/firstchar.py)
-
-        This lookup returns the first character of the contents from a
-        file on the Ansible controller's file system.
-
-  * This module is maintained by The Ansible Community
-OPTIONS (= is mandatory):
-
-= _terms
-        path(s) of files to read
 ```
 
-
-
-As you have seen so far, there is a great deal of overlap between plugin
-development and module development in Ansible. It is especially
-important to pay attention to error handling with exceptions to produce
-good quality, easy-to-understand error messages and to adhere to and
-uphold Ansible\'s high documentation standards. One additional item that
-we have not covered here is the plugin output. All plugins must return
-strings in Unicode; this ensures that they can run through the
-[jinja2] filters correctly. Further guidance can be found in the
-official Ansible documentation
-at <https://docs.ansible.com/ansible/latest/dev_guide/developing_plugins.html>.
 
 Armed with this knowledge, you should now be well placed to begin your
 own plugin development work, and even to submit your code back to the
@@ -747,20 +614,8 @@ community, if you desire. We\'ll offer a brief recap of this in the next
 section.
 
 
-
-Sharing plugins with the community
-----------------------------------
-
-You may wish to submit your new plugin to the Ansible project, just as
-we considered for our custom modules. The process for doing this with
-plugins is almost identical to what you do for modules, which this
-section will recap.
-
-
-Using the following process will submit a real request to the Ansible
-project on GitHub to merge the code you submit with their code.
-Do *not* follow this process unless you genuinely have a new module that
-is ready for submission to the Ansible codebase.
+Sharing plugins with the community (Optional)
+----------------------------------------------
 
 
 In order to submit your plugin as a PR of the Ansible repository, you
@@ -824,15 +679,6 @@ screenshot for your reference:
 
 ![](./images/c2be2eb5-8243-4e21-8d26-96e2769181b6.png)
 
-
-As discussed previously, don\'t be alarmed if it takes a long time for
-your PR to be reviewed---this is simply due to how many PRs there are to
-review and process. You can always use your plugin code locally by
-adding it to a local [\*\_plugins/] directory, as we demonstrated
-earlier, so that the processing speed of your PR doesn\'t hinder your
-work with Ansible. Further details of where to place your plugin code
-when working locally can be found
-at <https://docs.ansible.com/ansible/latest/dev_guide/developing_locally.html>.
 
 That completes our look at the creation of plugins, including two
 working examples. Hopefully, you have found this journey informative and

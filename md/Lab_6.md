@@ -370,8 +370,7 @@ a directory called [lookup\_plugins/]:
 ```
 
 2.  Next, add in the Python 3 headers---these are an absolute
-    requirement if you intend to submit your plugin via a **Pull
-    Request** (**PR**) to the Ansible project:
+    requirement if you intend to submit your plugin via a **Pull Request** (**PR**) to the Ansible project:
 
 ```
 from __future__ import (absolute_import, division, print_function)

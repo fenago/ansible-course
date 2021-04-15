@@ -703,8 +703,9 @@ Notice how the task to install Apache on Ubuntu was run. It was run this
 way because the [group\_by] module created a group called
 [os\_Ubuntu] and our second play only runs on hosts in the group
 called [os\_Ubuntu]. As there were no servers running on Ubuntu in
-the inventory, the [os\_Ubuntu] group was never created and so the
+the inventory, the [os\_CentOS] group was never created and so the
 third play does not run.
+
 
 Leveraging version control tools (Optional)
 ===========================================

@@ -1,7 +1,0 @@
----
-- hosts: routers
-  gather_facts: False
-  tasks:
-    - name: Gather IOS facts
-      ios_facts:
-        gather_subset: all

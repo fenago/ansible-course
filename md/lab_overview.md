@@ -34,9 +34,8 @@ Labs for this course are available at: `~/Desktop/ansible-course`
 6. Consuming and Creating Plugins
 7. Coding Best Practices
 8. Advanced Ansible Topics 
-9. Network Automation with Ansible
-10. Troubleshooting and Testing Strategies
-11. Assessments
+9. Troubleshooting and Testing Strategies
+10. Assessments
 
 
 ### About

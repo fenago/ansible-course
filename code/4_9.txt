@@ -20,11 +20,11 @@ TASK [Gathering Facts] *********************************************************
 changed: [app01.example.com]
 changed: [app02.example.com]
 
-TASK [Install Tomcat] **********************************************************
+TASK [Install NTP] **********************************************************
 changed: [app02.example.com]
 changed: [app01.example.com]
 
-TASK [Start the Tomcat server] *************************************************
+TASK [Start the NTP server] *************************************************
 changed: [app02.example.com]
 changed: [app01.example.com]
 

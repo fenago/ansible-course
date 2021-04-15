@@ -18,11 +18,11 @@
   become: true 
 
   tasks:
-  - name: Install Tomcat
+  - name: Install NTP
     apt:
-      name: tomcat
+      name: ntp
       state: latest
-  - name: Start the Tomcat server
+  - name: Start the NTP server
     service:
-      name: tomcat
+      name: ntp
       state: started

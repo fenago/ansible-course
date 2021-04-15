@@ -323,55 +323,7 @@ best approaches for working with cloud inventories.
 The best approach to cloud inventories
 ======================================
 
-In Lab 3, we looked at a simple example of how you can
-work with a dynamic inventory, and we walked you through a practical
-example using the Cobbler provisioning system. However, when it comes to
-working with cloud inventories (which are simply a form of dynamic
-inventory, but specifically focused on the cloud), they might, at first,
-seem somewhat confusing and you may find it difficult to get them up and
-running. If you follow the high-level procedure outlined in this
-section, this will become an easy and straightforward task.
-
-As this is a practically focused course, we will choose an example to work
-with. Sadly, we don\'t have space to provide practical examples for all
-of the cloud providers, but if you follow the high-level process we will
-outline for Amazon EC2 and apply it to your desired cloud provider (for
-example, Microsoft Azure or Google Cloud Platform), you will find that
-the process of getting up and running is actually quite straightforward.
-
-An important note before we start, however, is that in Ansible versions
-up to and including 2.8.x, the dynamic inventory scripts are part of the
-Ansible source code itself and can be obtained from the main Ansible
-repository that we examined and cloned previously in this course. With the
-ever-growing and expanding nature of Ansible, it has become necessary,
-in the version 2.9.x releases (and beyond), to separate the dynamic
-inventory scripts into a new distribution mechanism called Ansible
-collections, which will become mainstream in the 2.10 version (not yet
-released at the time of writing). You can learn more about Ansible
-collections and what they are
-at <https://www.ansible.com/blog/getting-started-with-ansible-collections>.
-
-
-The way you download and work with dynamic inventory scripts is likely
-to change radically with the 2.10 release of Ansible, yet sadly, very
-little has been revealed, at the time of writing, of what this will look
-like. As a result, we will guide you through the process of downloading
-your required dynamic inventory provider scripts for the current 2.9
-release, and advise you to consult the Ansible documentation when the
-2.10 release comes out for the download location of the relevant
-scripts. Once you have downloaded them, it is my understanding that you
-will be able to continue working with them as outlined in this lab.
-
-
-If you are working with the 2.9 release of Ansible, you can find and
-download all of the latest dynamic inventory scripts from the stable-2.9
-branch on GitHub,
-at <https://github.com/ansible/ansible/tree/stable-2.9/contrib/inventory>.
-
-Although the official Ansible documentation has been updated, most
-guides on the internet still reference the old GitHub locations of these
-scripts and you will find that they no longer work. Do bear this in mind
-when working with dynamic inventories! Let\'s now proceed to cover at
+Let\'s now proceed to cover at
 the process for working with a dynamic inventory script for a cloud
 provider; we will use the following Amazon EC2 dynamic inventory script
 as a working example, but the principles we apply here can equally be
@@ -917,54 +869,12 @@ Leveraging version control tools 
 =================================
 
 
-As we discussed earlier in this lab, it is vital that you version
-control and test not only your code but also your Ansible automation
-code. This should include inventories (or dynamic inventory scripts),
-any custom modules, plugins, roles, and playbook code. The reason for
-this is simple---the ultimate goal of Ansible automation is likely to be
-to deploy an entire environment using a playbook (or set of playbooks).
-This might even involve deploying infrastructure as code, especially if
-you are deploying to a cloud environment.
-
-Any changes to your Ansible code could mean big changes to your
-environment, and possibly even whether an important production service
-works or not. As a result, it is vital that you maintain a version
-history of your Ansible code and that everyone works from the same
-version. You are free to choose the version control system that suits
-you best; most corporate environments will already have some kind of
-version control system in place. However, if you haven\'t worked with
-version control systems before, we recommend that you sign up for a free
-account on somewhere such as GitHub or GitLab, which both offer version
-control repositories for free, along with more advanced paid-for plans.
-
-A complete discussion of version control with Git is beyond the scope of
-this course; there are, indeed, entire books devoted to the subject.
-However, we will take you through the simplest possible use case. It is
-assumed, in the following examples, that you are using a free account on
-GitHub, but if you are using a different provider, simply change the
-URLs to match those given to you by your version control repository
-host.
-
-In addition to this, you will need to install the command-line Git tools
-on your Linux host. On CentOS, you would install these as follows:
-
-
-```
-$ sudo apt install git
-```
-
-On Ubuntu, the process is similarly straightforward:
+You will need to install the command-line Git tools on your Linux host. On Ubuntu, the process is similarly straightforward:
 
 ```
 $ sudo apt-get update
 $ sudo apt-get install git
 ```
-
-Once the tools are installed and your account is set up, your next task
-is to clone a Git repository to your machine. If you want to start
-working with your own repository, you will need to set this up with your
-provider---excellent documentation is provided by both GitHub and GitLab
-and you should follow this to set up your first repository.
 
 Once it is set up and initialized, you can clone a copy to your local
 machine to make changes to your code. This local copy is called a

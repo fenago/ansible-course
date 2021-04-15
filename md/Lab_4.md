@@ -171,8 +171,17 @@ Let's change the default Apache port using template as port 80 is already in use
 ```
 
 
-If we run this task a first time, we
-will see the following results:
+**Note:** Make sure that apache2 is intalled before running the playbook: `service apache2 status`
+
+You can install apache2 by running `apt-get install -y apache2`. It can also installed by running following playbook:
+
+```
+$ cd ~/Desktop/ansible-course/Lab_2
+$ ansible-playbook update-apache-version.yml
+```
+
+
+If we run this task a first time, we will see the following results:
 
 ```
 $ ansible-playbook -i hosts handlers1.yml
@@ -428,13 +437,13 @@ started with building up our playbook:
   become: true
 
   tasks:
-  - name: Install Tomcat
+  - name: Install NTP
     apt:
-      name: tomcat
+      name: ntp
       state: latest
-  - name: Start the Tomcat server
+  - name: Start the NTP server
     service:
-      name: tomcat
+      name: ntp
       state: started
 ```
 
@@ -470,11 +479,11 @@ TASK [Gathering Facts] *********************************************************
 changed: [app01.example.com]
 changed: [app02.example.com]
 
-TASK [Install Tomcat] **********************************************************
+TASK [Install NTP] **********************************************************
 changed: [app02.example.com]
 changed: [app01.example.com]
 
-TASK [Start the Tomcat server] *************************************************
+TASK [Start the NTP server] *************************************************
 changed: [app02.example.com]
 changed: [app01.example.com]
 
@@ -529,7 +538,7 @@ roles/
      templates/
      vars/
      defaults/
-   installtomcat/
+   installntp/
      tasks/
      meta/
 ```

@@ -37,6 +37,9 @@ consistency and for testing purposes).
 
 Let\'s get started by building the directory structure:
 
+**Note:** Complete solution is avaialble at: `cd ~/Desktop/ansible-course/Lab_7/best-practise-directory-structure`
+
+
 1.  Create a directory tree for your development inventory with the
     following commands:
 
@@ -156,10 +159,6 @@ the following contents:
     msg: "{{ about_automation | improve_automation }}"
 ```
 
-In the preceding code, we\'ve reused a number of examples from earlier
-labs of this course. You can also define the handlers, variables,
-default values, and so on to the role, as discussed previously, but for
-our example, this will suffice.
 
 The final stage in creating our best practice directory structure is to
 add a top-level playbook to run. By convention, this will be called
@@ -225,6 +224,7 @@ Now, we can simply run our playbook in the normal manner. For example,
 to run it on the development inventory, execute the following:
 
 ```
+$ cd ~/Desktop/ansible-course/Lab_7/best-practise-directory-structure
 $ ansible-playbook -i inventories/development/hosts site.yml
 
 PLAY [Play using best practise directory structure] ****************************

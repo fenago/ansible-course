@@ -7,6 +7,7 @@
   file:
     path: /tmp/foo
     state: file
+  remote_user: root
 
 - name: Use custom module to copy /tmp/foo
   remote_filecopy:

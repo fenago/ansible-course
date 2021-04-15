@@ -67,19 +67,7 @@ shown:
 The two new parameters are [async] and [poll]. The
 [async] parameter tells Ansible that this task should be run
 asynchronously (so that the SSH connection will not be blocked) for a
-maximum of [30] seconds. If the task runs for longer than this
-configured time, Ansible considers the task to have failed and the play
-is failed, accordingly. When [poll] is set to a positive integer,
-Ansible checks the status of the asynchronous task at the specified
-interval---in this example, every [5] seconds. If [poll] is
-set to [0], then the task is run in the background and never
-checked---it is up to you to write a task to manually check its status
-later on.
-
-
-If you don\'t specify the [poll] value, it will be set to the
-default value defined by the [DEFAULT\_POLL\_INTERVAL]
-configuration parameter of Ansible (which is [10] seconds).
+maximum of [30] seconds.
 
 
 When you run this playbook, you will find that it runs just like any
@@ -180,15 +168,7 @@ frt02.example.com : ok=3 changed=2 unreachable=0 failed=0 skipped=0 rescued=0 ig
 In the preceding code block, we can see that the long-running task is
 left running and the next task polls its status until the conditions we
 set are met. In this case, we can see that the task finished
-successfully and the overall play result was successful. Asynchronous
-actions are especially useful for large downloads, package updates, and
-other tasks that might take a long time to run. You may find them useful
-in your playbook development, especially in more complex
-infrastructures. 
-
-With this under our belt, let\'s take a look at another advanced
-technique that might be useful in large infrastructures---performing
-rolling updates with Ansible.
+successfully and the overall play result was successful.
 
 
 Control play execution for rolling updates
@@ -286,23 +266,8 @@ frt01.example.com : ok=2 changed=2 unreachable=0 failed=0 skipped=0 rescued=0 ig
 frt02.example.com : ok=2 changed=2 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0
 ```
 
-Much better! If you imagine that this playbook actually disables these
-hosts on a load balancer, performs an upgrade, and then re-enables the
-hosts on the load balancer, this is exactly how you would want the
-operation to proceed. Doing so without the [serial: 1] directive
-would result in all the hosts being removed from the load balancer at
-once, causing a loss of service.
 
-It is useful to note that the [serial] directive can also take a
-percentage instead of an integer. When you specify a percentage, you are
-telling Ansible to run the play on that percentage of hosts at one time.
-So, if you have [4] hosts in your inventory and specify [serial:
-25%], Ansible will only run the play on one host at a time. If you
-have [8] hosts in your inventory, it will run the play on two
-hosts at a time. I\'m sure you get the idea!
-
-You can even build on this by passing a list to the [serial]
-directive. Consider the following code:
+You can even build on this by passing a list to the [serial] directive. Consider the following code:
 
 ```
   serial:
@@ -313,31 +278,12 @@ directive. Consider the following code:
 
 This tells Ansible to run the play on [1] host, initially, then on
 the next [3], and then on batches of [5] at a time until the
-inventory is completed. You can also specify a list of percentages in
-place of the integer numbers of hosts. In doing this, you will build up
-a robust playbook that can perform rolling updates without causing a
-loss of service to end users. With this complete, let\'s further build
-on this knowledge by looking at controlling the maximum failure
-percentage that Ansible can tolerate before it aborts a play, which
-will again be useful in highly available or load-balanced environments
-such as this.
+inventory is completed.
 
 
 Configuring the maximum failure percentage
 ==========================================
 
-In its default mode of operation, Ansible continues to execute a play on
-a batch of servers (the batch size is determined by the [serial]
-directive we discussed in the preceding section) as long as there are
-hosts in the inventory and a failure isn\'t recorded. Obviously, in a
-highly available or load-balanced environment (such as the one we
-discussed previously), this is not ideal. If there is a bug in your
-play, or perhaps a problem with the code being rolled out, the last
-thing that you want is for Ansible to faithfully roll it out to all
-servers in the cluster, causing a service outage because all the nodes
-suffered a failed upgrade. It would be far better, in this kind of
-environment, to fail early on and leave at least some hosts in the
-cluster untouched until someone can intervene and resolve the issue.
 
 For our practical example, let\'s consider an expanded inventory with
 [10] hosts in it. We\'ll define this as follows:
@@ -441,31 +387,9 @@ frt04.example.com : ok=1 changed=0 unreachable=0 failed=0 skipped=0 rescued=0 ig
 frt05.example.com : ok=1 changed=0 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0
 ```
 
-Notice the results of this playbook. We deliberately failed three of the
-first batch of 5, exceeding the threshold for
-[max\_fail\_percentage] that we set. This immediately causes the
-play to abort and the second task is not performed on the first batch of
-5. You will also notice that the second batch of 5, out of the 10 hosts,
-is never processed, so our play was truly aborted. This is exactly the
-behavior you would want to see to prevent a failed update from rolling
-out across a cluster. Through the careful use of batches and
-[max\_fail\_percentage], you can safely run automated tasks across
-an entire cluster without the fear of breaking the entire cluster in the
-event of an issue. In the next section, we will take a look at another
-feature of Ansible that can be incredibly useful when it comes to
-working with clusters---task delegation.
-
 
 Setting task execution delegation
 =================================
-
-In every play we have run so far, we have assumed that all the tasks are
-executed on each host in the inventory in turn. However, what if you
-need to run one or two tasks on a different host? For example, we have
-talked about the concept of automating upgrades on clusters. Logically,
-however, we would want to automate the entire process, including the
-removal of each host in turn from the load balancer and its return after
-the task is completed. 
 
 Although we still want to run our play across our entire inventory, we
 certainly don\'t want to run the load balancer commands from those
@@ -592,20 +516,6 @@ frt01.example.com : ok=4 changed=2 unreachable=0 failed=0 skipped=0 rescued=0 ig
 frt02.example.com : ok=4 changed=2 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0
 ```
 
-Notice how even though Ansible is working through the inventory (which
-doesn\'t feature [localhost]), the load balancer-related scripts
-are actually run from [localhost], while the upgrade task is
-performed directly on the remote host. This, of course, isn\'t the only
-thing you can do with task delegation, but it\'s a common example of a
-way that it can help you.
-
-In truth, you can delegate any task to [localhost], or even
-another non-inventory host. You could, for example, run an [rsync]
-command delegated to [localhost] to copy files to remote hosts
-using a similar task definition to the previous one. This is useful
-because although Ansible has a [copy] module, it can\'t perform
-the advanced recursive [copy] and [update] functions that
-[rsync] is capable of.
 
 Also, note that you can choose to use a form of shorthand notation in
 your playbooks (and roles) for [delegate\_to], called
@@ -668,18 +578,7 @@ to look at the special [run\_once] option.
 Using the run\_once option
 ==========================
 
-When working with clusters, you will sometimes encounter a task that
-should only be executed once for the entire cluster. For example, you
-might want to upgrade the schema of a clustered database or issue a
-command to reconfigure a Pacemaker cluster that would normally be issued
-on one node and replicated to all other nodes by Pacemaker. You could,
-of course, address this with a special inventory with only one host in
-it, or even by writing a special play that references one host from the
-inventory, but this is inefficient and starts to make your code
-fragmented.
-
-Instead, you can write your code as you normally would, but make use of
-the special [run\_once] directive for any tasks you want to run
+You can make use of the special [run\_once] directive for any tasks you want to run
 only once on your inventory. For example, let\'s reuse the 10-host
 inventory that we defined earlier in this lab. Now, let\'s proceed
 to demonstrate this option, as follows:
@@ -798,14 +697,7 @@ frt09.example.com : ok=1 changed=0 unreachable=0 failed=0 skipped=0 rescued=0 ig
 frt10.example.com : ok=1 changed=0 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0
 ```
 
-This is how the [run\_once] option is designed to work---you can
-observe, in the preceding output, that our schema upgrade ran twice,
-which is probably not something we wanted! However, with this awareness,
-you should be able to take advantage of this option to control your
-playbook flow across clusters and still achieve the results you want.
-Let\'s now move away from cluster-related Ansible tasks and look at the
-subtle but important difference between running playbooks locally and
-running them on [localhost].
+
 
 
 Running playbooks locally
@@ -829,8 +721,11 @@ localhost
 Now, if we attempt to run the [ping] module in an ad hoc command
 against this inventory, we see the following:
 
+Password: **fenago**
+
 ```
 $ ansible -i localhosts -m ping all --ask-pass
+
 The authenticity of host 'localhost (::1)' can't be established.
 ECDSA key fingerprint is SHA256:DUwVxH+45432pSr9qsN8Av4l0KJJ+r5jTo123n3XGvZs.
 ECDSA key fingerprint is MD5:78:d1:dc:23:cc:28:51:42:eb:fb:58:49:ab:92:b6:96.
@@ -889,6 +784,7 @@ new inventory we just defined:
 
 ```
 $ ansible -i localhosts2 -m file -a "path=/tmp/foo state=touch" all
+
 frt01.example.com | CHANGED => {
     "ansible_facts": {
         "discovered_interpreter_python": "/usr/bin/python"
@@ -918,11 +814,6 @@ It is! So, the ad hoc command did not attempt to connect to
 inventory. The presence of [ansible\_connection=local] meant that
 this command was run on the local machine without using SSH.
 
-This ability to run commands locally without the need to set up SSH
-connectivity, SSH keys, and so on can be incredibly valuable, especially
-if you need to get things up and running quickly on your local machine.
-With this complete, let\'s take a look at how you can work with proxies
-and jump hosts using Ansible.
 
 
 Working with proxies and jump hosts
@@ -998,17 +889,6 @@ Ansible works just as it normally does and connects successfully to the
 two hosts. However, behind the scenes it proxies via
 [bastion.example.com]. 
 
-Note that this simple example assumes that you are connecting to both
-the [bastion] host and [switches] using the same username
-and SSH credentials (or in this case, keys). There are ways to provide
-separate credentials for both variables, but this involves more advanced
-usage of OpenSSH, which is beyond the scope of this course. However, this
-section intends to give you a starting point and demonstrate the
-possibility of this, and you are free to explore OpenSSH proxying by
-yourself. 
-
-Let\'s now change track  and explore how it is possible to set up
-Ansible to prompt you for data during a playbook run.
 
 
 Configuring playbook prompts
@@ -1081,14 +961,8 @@ frt01.example.com : ok=2 changed=0 unreachable=0 failed=0 skipped=0 rescued=0 ig
 frt02.example.com : ok=2 changed=0 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0
 ```
 
-As you can see, we are prompted for both variables, yet the password is
-not echoed to the terminal, which is important for security reasons. We
-can then make use of the variables later in the playbook. Here, we just
-used a simple [debug] command to demonstrate that the variables
-have been set; however, you would instead implement an actual
-authentication function in place of this.
 
-With this complete, let\'s proceed to the next section and look at how
+Let\'s proceed to the next section and look at how
 you can selectively run your tasks from within your plays with the use
 of tags.
 
@@ -1187,14 +1061,6 @@ Note that if you don\'t specify either [\--tags] or
 tag.
 
 
-A few notes about tags---first of all, each task can have more than one
-tag, so we see them specified in a YAML list format. If you use the
-[\--tags] switch, a task will run if any of it\'s tags match the
-tag that was specified on the command line. Secondly, tags can be
-reused, so we could have five tasks that are all tagged [install],
-and all five tasks would be performed or skipped if you requested them
-to do so via [\--tags] or [\--skip-tags], respectively.
-
 You can also specify more than one tag on the command line, running all
 the tasks that match any of the specified tags. Although the logic
 behind tags is relatively simple, it can take a little while to get used
@@ -1236,28 +1102,15 @@ playbook: tags.yml
 As you can see, not only does [\--list-tasks] show you which tasks
 would run, it also shows you which tags are associated with them, which
 helps you further understand how tagging works and ensure that you
-achieve the playbook flow that you wanted. Tags are an incredibly simple
-yet powerful way to control which parts of your playbook run and often
-when it comes to creating and maintaining large playbooks, it is better
-to be able to run only selected parts of the playbook at once. From
-here, we will move on to the final section of this lab, where we
-will look at securing your variable data at rest by encrypting it with
-Ansible Vault.
+achieve the playbook flow that you wanted.
+
 
 
 Securing data with Ansible Vault
 ================================
 
-Ansible Vault is a tool included with Ansible that allows you to encrypt
-your sensitive data at rest, while also using it in a playbook. Often,
-it is necessary to store login credentials or other sensitive data in a
-variable to allow a playbook to run unattended. However, this risks
-exposing your data to people who might use it with malicious intent.
-Fortunately, Ansible Vault secures your data at rest using AES-256
-encryption, meaning your sensitive data is safe from prying eyes.
 
-Let\'s proceed with a simple example that shows you how you can use
-Ansible Vault:
+Let\'s proceed with a simple example that shows you how you can use Ansible Vault:
 
 1.  Start by creating a new vault to store sensitive data in; we\'ll
     call this file [secret.yml]. You can create this using the
@@ -1434,6 +1287,7 @@ see that it runs just as when we used an external encrypted
 
 ```
 $ ansible-playbook -i hosts inlinevaultplaybook.yml --ask-vault-pass
+
 Vault password:
 
 PLAY [A play that makes use of an Ansible Vault] *******************************

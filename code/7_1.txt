@@ -6,7 +6,7 @@
 - name: Create /tmp/foo
   file:
     path: /tmp/foo
-    state: file
+    state: touch
 
 - name: Use custom module to copy /tmp/foo
   remote_filecopy:

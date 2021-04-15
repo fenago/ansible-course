@@ -14,7 +14,7 @@
   tasks:
     - name: Install Apache on CentOS
       apt:
-        name: apache2
+        name: httpd
         state: present
 
 - name: Play to install Apache on Ubuntu

@@ -9,7 +9,6 @@ Lab 7. Coding Best Practices
 In this lab, we will cover the following topics:
 
 -   The preferred directory layout
--   The best approach to cloud inventories
 -   Differentiating between different environment types
 -   The proper approach to defining group and host variables
 -   Using top-level playbooks
@@ -29,7 +28,7 @@ The preferred directory layout
 
 In this lab, let\'s get started with a practical example of
 this to show you a great way of setting up your directory structure for
-a simple role-based playbook that has two different inventories---one
+a simple role-based playbook that has two different inventories --- one
 for a development environment and one for a production environment (you
 would want to keep these separate in any real-world use case, although
 ideally, you should be able to execute the same plays on both for
@@ -128,6 +127,7 @@ in Lab 4 to create the directory structure for us:
 ```
 $ mkdir roles
 $ ansible-galaxy role init --init-path roles/ installapp
+
 - Role installapp was created successfully
 ```
 
@@ -143,7 +143,8 @@ the following contents:
 - name: Create /tmp/foo
   file:
     path: /tmp/foo
-    state: file
+    state: touch
+  remote_user: root
 
 - name: Use custom module to copy /tmp/foo
   remote_filecopy:
@@ -316,278 +317,23 @@ for each inventory and how tidy and well organized our directory
 structure is. This is the ideal way for you to lay out your playbooks
 and will ensure that they can be scaled up to whatever size you need
 them to be, without them becoming unwieldy and difficult to manage or
-troubleshoot. In the next section of this lab, we will explore the
-best approaches for working with cloud inventories.
+troubleshoot.
 
-
-The best approach to cloud inventories
-======================================
-
-Let\'s now proceed to cover at
-the process for working with a dynamic inventory script for a cloud
-provider; we will use the following Amazon EC2 dynamic inventory script
-as a working example, but the principles we apply here can equally be
-used with any other cloud inventory scripts:
-
-1.  Having established that we are going to work with Amazon EC2, our
-    first task is to obtain the dynamic inventory script and its
-    associated configuration file. As cloud technologies move fast, it
-    is probably safest to download the latest version of these files
-    directly from the official Ansible project on GitHub. The following
-    three commands will download the dynamic inventory script and make
-    it executable, as well as downloading the template configuration
-    file:
-
-```
-$ wget https://raw.githubusercontent.com/ansible/ansible/stable-2.9/contrib/inventory/ec2.py
-$ chmod +x ec2.py
-$ wget https://raw.githubusercontent.com/ansible/ansible/stable-2.9/contrib/inventory/ec2.ini
-```
-
-2.  With the files successfully downloaded, let\'s take a look inside
-    them. Unfortunately, Ansible dynamic inventories do not have the
-    same neat documentation system that we have seen in modules and
-    plugins. Fortunately for us, however, the authors of these dynamic
-    inventory scripts have put lots of helpful comments at the top of
-    these files to get us started. Let\'s take a look inside
-    [ec2.py]:
-
-```
-#!/usr/bin/env python
-
-'''
-EC2 external inventory script
-=================================
-
-Generates inventory that Ansible can understand by making API request to
-AWS EC2 using the Boto library.
-
-NOTE: This script assumes Ansible is being executed where the environment
-variables needed for Boto have already been set:
-    export AWS_ACCESS_KEY_ID='AK123'
-    export AWS_SECRET_ACCESS_KEY='abc123'
-
-Optional region environment variable if region is 'auto'
-
-This script also assumes that there is an ec2.ini file alongside it. To specify
- a
-different path to ec2.ini, define the EC2_INI_PATH environment variable:
-
-    export EC2_INI_PATH=/path/to/my_ec2.ini
-```
-
-There are pages of documentation to read, but some of the most pertinent
-information is contained within those first few lines. First of all, we
-need to ensure that the [Boto] library is installed. Secondly, we
-need to set the AWS access parameters for [Boto]. The author of
-this document has given us the quickest way to get started (indeed, it
-is not their job to replicate the [Boto] documentation).
-
-However, if you refer to the official documentation for [Boto],
-you\'ll see that there are lots of ways of configuring it with your AWS
-credentials---setting the environment variables is just one. You can
-read more about configuring the [Boto] authentication
-at <https://boto3.amazonaws.com/v1/documentation/api/latest/guide/configuration.html>.
-
-3.  Before we go ahead and install [Boto], let\'s take a look at
-    the sample [ec2.ini] file:
-
-```
-# Ansible EC2 external inventory script settings
-#
-
-[ec2]
-
-# to talk to a private eucalyptus instance uncomment these lines
-# and edit edit eucalyptus_host to be the host name of your cloud controller
-#eucalyptus = True
-#eucalyptus_host = clc.cloud.domain.org
-
-# AWS regions to make calls to. Set this to 'all' to make request to all regions
-# in AWS and merge the results together. Alternatively, set this to a comma
-# separated list of regions. E.g. 'us-east-1,us-west-1,us-west-2' and do not
-# provide the 'regions_exclude' option. If this is set to 'auto', AWS_REGION or
-# AWS_DEFAULT_REGION environment variable will be read to determine the region.
-regions = all
-regions_exclude = us-gov-west-1, cn-north-1
-```
-
-Again, you can see pages of well-documented options in this file, and if
-you scroll all the way to the bottom, you\'ll even see that you can
-specify your credentials in this file as an alternative to the methods
-discussed previously. The default settings for this file are, however,
-sufficient if you just want to get started.
-
-4.  Let\'s now make sure the [Boto] library is installed; exactly
-    how you do this will depend on your chosen OS and your version of
-    Python. You might be able to install it through a package; on CentOS
-    7, you can do this as follows:
-
-```
-$ sudo apt -y install python-boto python-boto3
-```
-
-Alternatively, you can use [pip] for this purpose. For example, to
-install it as part of your Python 3 environment, you can run the
-following command:
-
-```
-$ sudo pip3 install boto3
-```
-
-5.  Once you have [Boto] installed, let\'s go ahead and set our
-    AWS credentials using the environment variables suggested to us in
-    the preceding documentation:
-
-```
-$ export AWS_ACCESS_KEY_ID='<YOUR_DATA>'
-$ export AWS_SECRET_ACCESS_KEY='<YOUR_DATA>'
-```
-
-6.  With these steps complete, you can now use your dynamic inventory
-    script in the usual way---you simply reference the executable
-    inventory script with the [-i] parameter in the same way you
-    do with static inventories. For example, if you want to run the
-    Ansible [ping] module as an ad hoc command against all the
-    hosts you have running in Amazon EC2, you would need to run the
-    following command. Make sure you substitute the user account
-    specified by the [-u] switch with the one you connect to your
-    EC2 instances with. Also, reference your private SSH key file:
-
-
-```
-$ ansible -i ec2.py -u ec2-user --private-key /home/james/my-ec2-id_rsa -m ping all
-```
-
-
-
-That\'s all there is to it---if you approach all dynamic inventory
-scripts in this same methodical manner, you will have no problem getting
-them up and running. Just remember that the documentation is normally
-embedded in both the script file and its accompanying configuration
-file, and make sure you read both before you attempt to use the scripts.
-
-One thing to note is that many of the dynamic inventory scripts,
-[ec2.py] included, cache the results of their API calls to the
-cloud provider to speed up repeated runs and avoid excessive API calls.
-However, you might find that in a fast-moving development environment,
-changes to your cloud infrastructure are not picked up fast enough. For
-most scripts, there are two ways around this---most feature cache
-configuration parameters in their configuration file, such as the
-[cache\_path] and [cache\_max\_age] parameters
-in  [ec2.ini]. If you don\'t want to set these for every single
-run, you can also refresh the cache manually by calling the dynamic
-inventory script directly with a special switch---for example, in
-[ec2.py]:
-
-```
-$ ./ec2.py --refresh-cache
-```
-
-
-That concludes our practical introduction to cloud inventory scripts. As
-we discussed, provided you consult the documentation (both on the
-internet and embedded within each dynamic inventory script) and follow
-the simple methodology we described, you should have no problems and
-should be able to get up and running with dynamic inventories in
-minutes. In the next section, we\'ll revert back to looking at static
-inventories and the best ways to differentiate your various technology
-environments.
-
-
-Differentiating between different environment types
-===================================================
-
-In almost every business, you will need to split your technology
-environment by type. For example, you will almost certainly have a
-development environment, where all the testing and development work is
-performed, and a production environment, where all of the stable test
-code is run. The environments should (in a best-case scenario) make use
-of the same Ansible playbooks---after all, the logic is that if you can
-successfully deploy and test an application in your development
-environment, then you should be able to deploy it in the same way in a
-production environment and have it work just as well. However, there are
-always differences between the two environments, not just in the
-hostnames, but also sometimes in the parameters, the load balancer
-names, the port numbers, and so on---the list can seem endless.
-
-In the *The preferred directory layout* section of this lab, we
-covered a way of differentiating between a development and production
-environment using two separate inventory directory trees. This is how
-you should proceed when it comes to differentiating these environments;
-so, obviously, we won\'t repeat the examples, but it\'s important to
-note that when working with multiple environments, your goals should be
-as follows:
-
--   Try and reuse the same playbooks for all of your environments that
-    run the same code. For example, if you deploy a web app in your
-    development environment, you should be confident that your playbooks
-    will deploy the same app in the production environment (and your
-    **Quality Assurance** (**QA**) environment, as well as any others
-    that it might need to be deployed in).
--   This means that not only are you testing your application
-    deployments and code, you are also testing your Ansible playbooks
-    and roles as part of your overall testing process.
-
-
--   Your inventories for each environment should be kept in separate
-    directory trees (as we saw in the *The preferred directory
-    layout *section of this lab), but all roles, playbooks, plugins,
-    and modules (if used) should be in the same directory structure
-    (this should be the case for both environments).
--   It is normal for different environments to require different
-    authentication credentials; you should keep these separate not only
-    for security but also to ensure that playbooks are not accidentally
-    run in the wrong environment.
--   Your playbooks should be in your version control system, just as
-    your code is. This enables you to track changes over time and ensure
-    that everyone is working from the same copy of the automation code.
-
-If you pay attention to these simple pointers, you will find that your
-automation workflow becomes a real asset to your business and ensures
-reliability and consistency across all of your deployments. Conversely,
-failure to follow these pointers puts you at risk of experiencing the
-dreaded, *it worked in development but it doesn\'t work in
-production* deployment failures that so often plague the technology
-industry. Let\'s now build on this discussion in the next section by
-looking at best practices when handling host and group variables,
-something that, as we saw in *The* *preferred directory layout* section,
-you need to apply, especially when working with multiple environments.
 
 
 The proper approach to defining group and host variables
 ========================================================
 
-When working with group and host variables, you can split them up using
-the directory-based approach we used in the *The preferred directory
-layout* section. However, there are a few additional pointers to
-managing this that you should be aware of. First and foremost, you
-should always pay attention to variable precedence. A detailed list of
-variable precedence order can be found
-at <https://docs.ansible.com/ansible/latest/user_guide/playbooks_variables.html#variable-precedence-where-should-i-put-a-variable>.
-However, the key takeaways for working with multiple environments are as
-follows:
-
--   Host variables are always of a higher order of precedence than group
-    variables; so, you can override any group variable with a host
-    variable. This behavior is useful if you take advantage of it in a
-    controlled manner, but can yield unexpected results if you are not
-    aware of it.
--   There is a special group variables definition called [all],
-    which is applied to all inventory groups. This has a lower order of
-    precedence than specifically defined group variables.
-
-
--   What happens if you define the same variable twice in two groups? If
-    this happens, both groups have the same order of precedence, so
-    which one wins? To demonstrate this (and our earlier examples), we
-    will create a simple practical example for you to follow.
 
 To get started, let\'s create a directory structure for our inventories.
 To keep this example as concise as possible, we will only create a
 development environment. However, you are free to expand on these
 concepts by building on the more complete example we covered in the *The
 preferred directory layout* section of this lab:
+
+
+**Note:** Complete solution is avaialble at: `cd ~/Desktop/ansible-course/Lab_7/variable-precedence-1`
+
 
 1.  Create an inventory directory structure with the following commands:
 
@@ -634,7 +380,9 @@ http_port: 8080
     only defined in one place) takes the value we would expect:
 
 ```
+$ cd ~/Desktop/ansible-course/Lab_7/variable-precedence-1
 $ ansible-playbook -i inventories/development/hosts site.yml
+
 
 PLAY [Play using best practise directory structure] ****************************
 
@@ -673,6 +421,7 @@ http_port: 8081
     follows:
 
 ```
+$ cd ~/Desktop/ansible-course/Lab_7/variable-precedence-2
 $ ansible-playbook -i inventories/development/hosts site.yml
 
 PLAY [Play using best practise directory structure] ****************************
@@ -741,6 +490,7 @@ http_port: 8083
     Let\'s rerun our playbook and see which value comes through:
 
 ```
+$ cd ~/Desktop/ansible-course/Lab_7/variable-precedence-3
 $ ansible-playbook -i inventories/development/hosts site.yml
 
 PLAY [Play using best practise directory structure] ****************************
@@ -788,6 +538,7 @@ http_port: 9090
     group variable from the [newcentos] group---won:
 
 ```
+$ cd ~/Desktop/ansible-course/Lab_7/variable-precedence-4
 $ ansible-playbook -i inventories/development/hosts site.yml
 
 PLAY [Play using best practise directory structure] ****************************
@@ -812,62 +563,151 @@ app02.dev.example.com : ok=2 changed=0 unreachable=0 failed=0 skipped=0 rescued=
 
 With this knowledge, you can now make advanced decisions about how to
 structure your variables within your inventory to make sure you achieve
-the desired results at both a host and group level. It\'s important to
-know about variable precedence ordering, as these examples have
-demonstrated, but following the documented order will also allow you to
-produce powerful, flexible playbook inventories that work well across
-multiple environments. Now, you may have noticed that, throughout this
-lab, we have used a top-level playbook in our directory structure
-called [site.yml]. We will look at this playbook in greater
-detail in the next section.
+the desired results at both a host and group level.
 
 
-Using top-level playbooks
-=========================
 
 
-In all of the examples so far, we have built out using the best practice
-directory structure recommended by Ansible and continually referred to a
-top-level playbook, typically called [site.yml]. The idea behind
-this playbook, and, indeed, its common name across all of our directory
-structures, is so that it can be used across your entire server
-estate---that is to say, your **site**.
-
-This, of course, is not to say that you have to use the same set of
-playbooks across every server in your infrastructure or for every single
-function; rather, it means only you can make the best decision as to
-what suits your environment best. However, the whole aim of Ansible
-automation is that the created solution is simple to run and operate.
-Imagine handing a playbook directory structure with 100 different
-playbooks to a new system administrator---how would they know which ones
-to run and in which circumstances? The task of training someone to use
-the playbooks would be immense and would simply move complexity from one
-area to another.
-
-At the other the end of the spectrum, you could make use of
-the [when] clauses with facts and inventory grouping, such that
-your playbook knows exactly what to run on each server in every possible
-circumstance. This, of course, is unlikely to happen and the truth is
-that your automation solution will end up somewhere in the middle.
-
-The most important thing is that, on receipt of a new playbook directory
-structure, a new operator at least knows what the starting point for
-both running the playbooks, and understanding the code is. If the
-top-level playbook they encounter is always [site.yml], then at
-least everyone knows where to start. Through the clever use of roles and
-the [import\_\*] and [include\_\*] statements, you can split
-your playbook up into logical portions of reusable code, as we
-previously discussed, all from one playbook file. 
-
-Now that you have learned about the importance of top-level playbooks,
-let\'s take a look, in the next section, at how to take advantage of
-version control tools to ensure good practices are adhered to when it
-comes to centralizing and maintaining your automation code.
+Setting OS and distribution variances
+=====================================
 
 
-Leveraging version control tools 
-=================================
+Assume that we are using the following simple inventory file for this
+example, which has two hosts in a single group called [app]:
 
+
+```
+[app]
+app01.dev.example.com
+app02.dev.example.com
+```
+
+Let\'s now build a simple playbook that demonstrates how you can group
+differing plays using an Ansible fact so that the OS distribution
+determines which play in a playbook gets run. Follow these steps to
+create this playbook and observe it\'s operation:
+
+1.  Start by creating a new playbook---we\'ll call it
+    [osvariants.yml]---with the following [Play] definition.
+    It will also contain a single task, as shown:
+
+```
+---
+- name: Play to demonstrate group_by module
+  hosts: all
+
+  tasks:
+    - name: Create inventory groups based on host facts
+      group_by:
+        key: os_{{ ansible_facts['distribution'] }}
+```
+
+The playbook structure will be, by now, incredibly familiar to you.
+However, the use of the [group\_by] module is new. It dynamically
+creates new inventory groups based on the key that we specify---in this
+example, we are creating groups based on a key comprised of
+the [os\_] fixed string, followed by the OS distribution fact
+obtained from the [Gathering Facts] stage. The original inventory
+group structure is preserved and unmodified, but all the hosts are also
+added to the newly created groups according to their facts.
+
+
+2.  Armed with this information, we can go ahead and create additional
+    plays based on the newly created groups. Let\'s add the following
+    [Play] definition to the same playbook file to install Apache
+    on CentOS:
+
+```
+- name: Play to install Apache on CentOS
+  hosts: os_CentOS
+  become: true
+
+  tasks:
+    - name: Install Apache on CentOS
+      apt:
+        name: httpd
+        state: present
+```
+
+This is a perfectly normal [Play] definition that uses the
+[apt] module to install the [apache2] package (as required on
+CentOS). The only thing that differentiates it from our earlier work is
+the [hosts] definition at the top of the play. This uses the newly
+created inventory group created by the [group\_by] module in the
+first play.
+
+3.  We can, similarly, add a third [Play] definition, this time
+    for installing the [apache2] package on Ubuntu using the
+    [apt] module:
+
+```
+- name: Play to install Apache on Ubuntu
+  hosts: os_Ubuntu
+  become: true
+
+  tasks:
+    - name: Install Apache on Ubuntu
+      apt:
+        name: apache2
+        state: present
+```
+
+4.  If our environment is based on CentOS servers and we run this playbook, the results are as follows:
+
+```
+$ ansible-playbook -i hosts osvariants.yml
+
+
+PLAY [Play to demonstrate group_by module]
+ ************************************************
+
+TASK [Gathering Facts] 
+**************************************************
+ok: [app01.dev.example.com]
+ok: [app02.dev.example.com]
+
+TASK [Create inventory groups based on host facts] 
+********************************************************************
+ok: [app01.dev.example.com]
+ok: [app02.dev.example.com]
+[WARNING]: Could not match supplied host pattern, ignoring: os_CentOS
+
+PLAY [Play to install Apache on CentOS]
+******************************************************************
+skipping: no hosts matched
+
+PLAY [Play to install Apache on Ubuntu]
+*************************************************
+
+TASK [Gathering Facts] 
+********************************************************
+
+ok: [app02.dev.example.com]
+ok: [app01.dev.example.com]
+
+TASK [Install Apache on Ubuntu] 
+*******************************************************
+ok: [app02.dev.example.com]
+ok: [app01.dev.example.com]
+
+PLAY RECAP
+****************************************************************************************************************************
+app01.dev.example.com      : ok=4    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+app02.dev.example.com      : ok=4    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0  
+```
+
+<span style="color:red;">Since we have added all above hosts in `/etc/hosts` with `127.0.0.1` address so they are pointing to same machine, you might get apt-get lock error which can be ignored. This error won't occur using multiple machines</span>
+
+
+Notice how the task to install Apache on Ubuntu was run. It was run this
+way because the [group\_by] module created a group called
+[os\_Ubuntu] and our second play only runs on hosts in the group
+called [os\_Ubuntu]. As there were no servers running on Ubuntu in
+the inventory, the [os\_Ubuntu] group was never created and so the
+third play does not run.
+
+Leveraging version control tools (Optional)
+===========================================
 
 You will need to install the command-line Git tools on your Linux host. On Ubuntu, the process is similarly straightforward:
 
@@ -917,8 +757,10 @@ $ git add myplaybook.yml
 
 ```
 $ git commit -m 'Added new spongle-widget deployment to myplaybook.yml'
+
 [master ed14138] Added new spongle-widget deployment to myplaybook.yml
  Committer: Fenago <ansible@fenago.com>
+ 
 Your name and email address were configured automatically based
 on your username and hostname. Please check that they are accurate.
 You can suppress this message by setting them explicitly. Run the
@@ -955,188 +797,23 @@ To https://github.com/<YOUR_GIT_ACCOUNT>/<GIT_REPO>.git
 
 That\'s all there is to it! 
 
-6.  Now, other collaborators can clone your code just as we did in *step
-    1*. Alternatively, if they already have a working copy of your
+6.  Now, other collaborators can clone your code. Alternatively, if they already have a working copy of your
     repository, they can update their working copy using the following
-    command (you can also do this if you want to update your working
-    copy to see changes made by someone else):
+    command:
 
 ```
 $ git pull
 ```
-
-There are some incredibly advanced topics and use cases for Git that are
-beyond the scope of this course. However, you will find that roughly 80%
-of the time, the preceding commands are all the Git command-line
-knowledge you need. There are also a number of graphical frontends to
-Git, as well as code editors and **Integrated Development Environments**
-(**IDEs**), that integrate with Git repositories and can assist you
-further in taking advantage of them. With that complete, let\'s take a
-look at how to ensure you can use the same playbook (or role) across
-multiple hosts, even though they might have different OSes and versions.
-
-
-Setting OS and distribution variances
-=====================================
-
-
-Assume that we are using the following simple inventory file for this
-example, which has two hosts in a single group called [app]:
-
-
-```
-[app]
-app01.dev.example.com
-app02.dev.example.com
-```
-
-Let\'s now build a simple playbook that demonstrates how you can group
-differing plays using an Ansible fact so that the OS distribution
-determines which play in a playbook gets run. Follow these steps to
-create this playbook and observe it\'s operation:
-
-1.  Start by creating a new playbook---we\'ll call it
-    [osvariants.yml]---with the following [Play] definition.
-    It will also contain a single task, as shown:
-
-```
----
-- name: Play to demonstrate group_by module
-  hosts: all
-
-  tasks:
-    - name: Create inventory groups based on host facts
-      group_by:
-        key: os_{{ ansible_facts['distribution'] }}
-```
-
-The playbook structure will be, by now, incredibly familiar to you.
-However, the use of the [group\_by] module is new. It dynamically
-creates new inventory groups based on the key that we specify---in this
-example, we are creating groups based on a key comprised of
-the [os\_] fixed string, followed by the OS distribution fact
-obtained from the [Gathering Facts] stage. The original inventory
-group structure is preserved and unmodified, but all the hosts are also
-added to the newly created groups according to their facts.
-
-So, the two servers in our simple inventory remain in the [app]
-group, but if they are based on Ubuntu, they will be added to a newly
-created inventory group called [os\_Ubuntu]. Similarly, if they
-are based on CentOS, they will be added to a group called
-[os\_CentOS].
-
-2.  Armed with this information, we can go ahead and create additional
-    plays based on the newly created groups. Let\'s add the following
-    [Play] definition to the same playbook file to install Apache
-    on CentOS:
-
-```
-- name: Play to install Apache on CentOS
-  hosts: os_CentOS
-  become: true
-
-  tasks:
-    - name: Install Apache on CentOS
-      apt:
-        name: apache2
-        state: present
-```
-
-This is a perfectly normal [Play] definition that uses the
-[apt] module to install the [apache2] package (as required on
-CentOS). The only thing that differentiates it from our earlier work is
-the [hosts] definition at the top of the play. This uses the newly
-created inventory group created by the [group\_by] module in the
-first play.
-
-3.  We can, similarly, add a third [Play] definition, this time
-    for installing the [apache2] package on Ubuntu using the
-    [apt] module:
-
-```
-- name: Play to install Apache on Ubuntu
-  hosts: os_Ubuntu
-  become: true
-
-  tasks:
-    - name: Install Apache on Ubuntu
-      apt:
-        name: apache2
-        state: present
-```
-
-4.  If our environment is based on CentOS servers and we run this
-    playbook, the results are as follows:
-
-```
-$ ansible-playbook -i hosts osvariants.yml
-
-PLAY [Play to demonstrate group_by module] *************************************
-
-TASK [Gathering Facts] *********************************************************
-ok: [app02.dev.example.com]
-ok: [app01.dev.example.com]
-
-TASK [Create inventory groups based on host facts] *****************************
-ok: [app01.dev.example.com]
-ok: [app02.dev.example.com]
-
-PLAY [Play to install Apache on CentOS] ****************************************
-
-TASK [Gathering Facts] *********************************************************
-ok: [app01.dev.example.com]
-ok: [app02.dev.example.com]
-
-TASK [Install Apache on CentOS] ************************************************
-changed: [app02.dev.example.com]
-changed: [app01.dev.example.com]
-[WARNING]: Could not match supplied host pattern, ignoring: os_Ubuntu
-
-PLAY [Play to install Apache on Ubuntu] ****************************************
-skipping: no hosts matched
-
-PLAY RECAP *********************************************************************
-app01.dev.example.com : ok=4 changed=2 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0
-app02.dev.example.com : ok=4 changed=2 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0
-```
-
-Notice how the task to install Apache on CentOS was run. It was run this
-way because the [group\_by] module created a group called
-[os\_CentOS] and our second play only runs on hosts in the group
-called [os\_CentOS]. As there were no servers running on Ubuntu in
-the inventory, the [os\_Ubuntu] group was never created and so the
-third play does not run. We receive a warning about the fact that there
-is no host pattern that matches [os\_Ubuntu], but the playbook
-does not fail---it simply skips this play.
-
-We provided this example to show you another way of managing the
-inevitable variance in OS types that you will come across in your
-automation coding. At the end of the day, it is up to you to choose the
-coding style most appropriate to you. You can make use of the
-[group\_by] module, as detailed here, or write your tasks in
-blocks and add a [when] clause to the blocks so that they only run
-when a certain fact-based condition is met (for example, the OS
-distribution is CentOS)---or perhaps even a combination of the two. The
-choice is ultimately yours and these different examples are provided to
-empower you with multiple options that you can choose between to create
-the best possible solution for your scenario. 
-
-Finally, let\'s round off this lab with a look at porting your
-automation code between Ansible versions. 
-
 
 
 Summary
 =======
 
 In this lab, you learned about the best practices for directory
-layout that you should adopt for your playbooks and the steps you should
-adopt when working with cloud inventories. You then learned new ways of
+layout that you should adopt for your playbooks. You then learned new ways of
 differentiating environments by OS type, as well as more about variable
 precedence and how to leverage it when working with host and group
-variables. You then explored the importance of the top-level playbook,
-before looking at how to make use of version control tools to manage
-your automation code. Finally, you explored the new techniques for
+variables. Finally, you explored the new techniques for
 creating single playbooks that will manage servers of different OS
 versions and distributions, before finally looking at the important
 topic of porting your code to new Ansible versions.
@@ -1176,14 +853,3 @@ A\) True
 
 B\) False
 
-
-Further reading
-===============
-
-Manage multiple repositories, versions, or tasks by creating branches
-and tags to control multiple versions effectively. Refer to the
-following links for more details:
-
--   How to use Git tagging:
-    <https://git-scm.com/course/en/v2/Git-Basics-Tagging>
--   How to use Git branches: <https://git-scm.com/docs/git-branch>

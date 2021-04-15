@@ -32,16 +32,7 @@ All lab file are present at below path. Run following command in the terminal fi
 Digging into playbook execution problems
 ========================================
 
-There are cases where an Ansible execution will interrupt. Many things
-can cause these situations.
-
-The single most frequent cause of problems I\'ve found while executing
-Ansible playbooks is the network. Since the machine that is issuing the
-commands and the one that is performing them are usually linked through
-the network, a problem in the network will immediately show itself as an
-Ansible execution problem.
-
-Sometimes, and this is particularly true for some modules, such as
+For some modules, such as
 [shell] or [command], the return code is non-zero, even
 though the execution was successful. In those cases, you can ignore the
 error by using the following line in your module:
@@ -61,14 +52,8 @@ blocking there, you can write something like the following:
 ```
 
 As we have seen, [/bin/false] will always return [1] as
-return code, but we still managed to go forward in the execution. Be
-aware that this is a particular case, and often, the best approach is to
-fix your application so that you\'re following UNIX standards and return
-[0] if the application runs appropriately, instead of putting a
-workaround in your Playbooks.
+return code, but we still managed to go forward in the execution.
 
-Next, we will talk more about the methods we can use to diagnose Ansible
-execution problems.
 
 
 Using host facts to diagnose failures
@@ -164,14 +149,6 @@ PLAY RECAP *********************************************************************
 localhost : ok=3 changed=1 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0 
 ```
 
-In the first task, we used the [command] module to execute the
-[uptime] command and saved its output in the [result]
-variable. Then, in the second task, we used the [debug] module to
-print the content of the [result] variable.
-
-The [debug] module is the module that allows you to print the
-value of a variable (by using the [var] option) or a fixed string
-(by using the [msg] option) during Ansible\'s execution.
 
 The [debug] module also provides the [verbosity] option.
 Let\'s say you change the playbook in the following way:
@@ -211,9 +188,6 @@ By putting two [-v] options in the command line, we will be
 running Ansible with [verbosity] of [2]. This will not only
 affect this specific module but all the modules (or Ansible itself) that
 are set to behave differently at different debug levels.
-
-Now that you have learned how to test with a playbook, let\'s learn how
-to use check mode.
 
 
 
@@ -264,19 +238,6 @@ localhost : ok=2 changed=0 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0
 
 However, if you look in [/tmp], you won\'t find [myfile].
 
-Ansible check mode is usually called a dry run. The idea is that the run
-won\'t change the state of the machine and will only highlight the
-differences between the current status and the status declared in the
-playbook.
-
-
-Not all modules support check mode, but all major modules do, and more
-and more modules are being added at every release. In particular, note
-that the [command] and [shell] modules do not support it
-because it is impossible for the module to tell what commands will
-result in a change, and what won\'t. Therefore, these modules will
-always return changed when they\'re run outside of check mode because
-they assume a change has been made. 
 
 
 A similar feature to check mode is the [\--diff] flag. What this
@@ -323,20 +284,11 @@ moved from [absent] to [touch], which means the file was
 created. [mtime] and [atime] also changed, but this is
 probably due to how files are created and checked.
 
-Now that you have learned how to use check mode, let\'s learn how to
-solve host connection issues.
-
 
 Solving host connection issues
 ==============================
 
-Ansible is often used to manage remote hosts or systems. To do this,
-Ansible will need to be able to connect to the remote host, and only
-after that will it be able to issue commands. Sometimes, the problem is
-that Ansible is unable to connect to the remote host. A typical example
-of this is when you try to manage a machine that hasn\'t booted yet.
-Being able to quickly recognize these kinds of problems and fix them
-promptly will help you save a lot of time.
+
 
 Follow these steps to get started:
 
@@ -407,10 +359,6 @@ problems. For instance, I would do this like so:
 $ ssh host.example.com -vvv
 ```
 
-I\'ve taken the hostname from the error itself to ensure that I\'m
-simulating exactly what Ansible is doing. I\'m doing this to ensure that
-I can see all possible logging messages that SSH is able to give me to
-troubleshoot the problem.
 
 The second problem might be a little bit more complex to debug since it
 can happen for multiple reasons. One of those is that you are trying to
@@ -482,34 +430,7 @@ PLAY RECAP *********************************************************************
 localhost : ok=2 changed=0 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0 
 ```
 
-Ansible allows variables to be set in various modes and with different
-priorities. More specifically, you can set them with the following:
 
--   Command-line values (lowest priority)
--   Role defaults
--   Inventory files or script group [vars]
--   Inventory [group\_vars/all]
--   Playbook [group\_vars/all]
--   Inventory [group\_vars/\*]
--   Playbook [group\_vars/\*]
--   Inventory files or script host vars
--   Inventory [host\_vars/\*]
--   Playbook [host\_vars/\*]
--   Host facts/cached [set\_facts]
--   Play [vars]
--   Play [vars\_prompt]
--   Play [vars\_files]
--   Role [vars] (defined in [role/vars/main.yml])
--   Block [vars] (only for tasks in block)
--   Task [vars] (only for the task)
--   [include\_vars]
--   [set\_facts]/registered vars
--   Role (and [include\_role]) params
--   [include] params
--   Extra vars (highest priority)
-
-As you can see, the last option (and the highest priority of them all)
-is using [\--extra-vars] in the execution command.
 
 Now that you have learned how to pass working variables via CLI, let\'s
 learn how to limit the host\'s execution.
@@ -654,15 +575,11 @@ ansible-playbook -i inventory helloworld.yaml --flush-cache
 
 Ansible uses Redis to save host variables, as well as execution
 variables. Sometimes, those variables might be left behind and influence
-the following executions. When Ansible finds a variable that should be
-set in the step it just started, Ansible might assume that the step has
-already been completed, and therefore pick up that old variable as if it
-has just been created. By using the [\--flush-cache] option, we
+the following executions. By using the [\--flush-cache] option, we
 can avoid this since it will ensure that Ansible flushes the Redis cache
 during its execution.
 
-Now that you have learned how to flush the code cache, let\'s learn how
-to check for bad syntax.
+Now that you have learned how to flush the code cache, let\'s learn how to check for bad syntax.
 
 
 Checking for bad syntax
@@ -729,11 +646,6 @@ playbook: syntaxcheck.yaml
 When the syntax check doesn\'t find any errors, the output will resemble
 the previous one, where it listed the files that were analyzed without
 listing any errors.
-
-Since Ansible knows all the supported options in all the supported
-modules, it can quickly read your code and validate whether the YAML you
-provided contains all the required fields and that it does not contain
-any unsupported fields.
 
 
 Summary

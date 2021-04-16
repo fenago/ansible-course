@@ -26,17 +26,22 @@ All lab file are present at below path. Run following command in the terminal fi
 
 `cd ~/Desktop/ansible-course/Lab_8` 
 
+### Pre-req:
+
+Make sure that following entries exist in `/root/hosts` file  before starting the lab:
+
+`cat /root/hosts`
+
+```
+[frontends]
+frt01.example.com
+frt02.example.com
+```
 
 Asynchronous versus synchronous actions
 =======================================
 
-Ansible tasks can be run asynchronously---that is to say,
-tasks can be run in the background on the target host and polled on a
-regular basis. This is in contrast to synchronous tasks, where the
-connection to the target host is kept open until the task completes
-(which runs the risk of a timeout occurring). 
-
-As ever, let\'s explore this through a practical example. Suppose we
+Ansible tasks can be run asynchronously. Let\'s explore this through a practical example. Suppose we
 have two servers in a simple INI-formatted inventory:
 
 ```
@@ -174,8 +179,7 @@ successfully and the overall play result was successful.
 Control play execution for rolling updates
 ==========================================
 
-By default, Ansible parallelizes tasks on multiple hosts at the same
-time to speed up automation tasks in large inventories. The setting for
+By default, Ansible parallelizes tasks on multiple hosts. The setting for
 this is defined by the [forks] parameter in the Ansible
 configuration file, which defaults to [5] (so, by default, Ansible
 attempts to run its automation job on five hosts at the same time).
@@ -203,7 +207,7 @@ attempts to run its automation job on five hosts at the same time).
 
 2.  Now, if you run this play, you will see that it performs all the
     operations on each host simultaneously, as we have fewer hosts than
-    the default number of forks---[5]. This behavior is normal for
+    the default number of forks --- [5]. This behavior is normal for
     Ansible, but not really what we want as our users will experience
     service outage:
 
@@ -308,11 +312,6 @@ our batch size to [5] and [max\_fail\_percentage] to
   serial: 5
   max_fail_percentage: 50
 ```
-
-We have defined [10] hosts in our inventory, so it will process
-them in batches of 5 (as specified by [serial: 5]). We will fail
-the entire play and stop performing processing if more than 50% of the
-hosts in one batch fails.
 
 
 The number of failed hosts must exceed the value
@@ -449,18 +448,6 @@ these scripts!
       delegate_to: localhost
 ```
 
-Notice the task structure---most of it will be familiar to you. We are
-using the [command] module to call the script we created earlier,
-passing the hostname from the inventory being removed from the load
-balancer to the script. We use the [chdir] argument with the
-[playbook\_dir] magic variable to tell Ansible that the script is
-to be run from the same directory as the playbook.
-
-The special part of this task is the [delegate\_to] directive,
-which tells Ansible that even though we\'re iterating through an
-inventory that doesn\'t contain [localhost], we should run this
-action on [localhost] (we aren\'t copying the script to our remote
-hosts, so it won\'t run if we attempt to run it from there).
 
 4.  After this, we add a task where the upgrade work is carried out.
     This task has no [delegate\_to] directive, and so it is
@@ -568,11 +555,7 @@ frt02.example.com : ok=2 changed=1 unreachable=0 failed=0 skipped=0 rescued=0 ig
 ```
 
 
-This concludes our look at task delegation, although as stated, these
-are just two common examples. I\'m sure you can think up some more
-advanced use cases for this capability. Let\'s continue looking at
-controlling the flow of Ansible code by proceeding, in the next section,
-to look at the special [run\_once] option.
+<span style="color:red;">Since we have added all above hosts in `/etc/hosts` with `127.0.0.1` address so they are pointing to same machine, you might get *file has vanished* error which can be ignored. This error won't occur using multiple machines</span>
 
 
 Using the run\_once option
@@ -726,10 +709,7 @@ Password: **fenago**
 ```
 $ ansible -i localhosts -m ping all --ask-pass
 
-The authenticity of host 'localhost (::1)' can't be established.
-ECDSA key fingerprint is SHA256:DUwVxH+45432pSr9qsN8Av4l0KJJ+r5jTo123n3XGvZs.
-ECDSA key fingerprint is MD5:78:d1:dc:23:cc:28:51:42:eb:fb:58:49:ab:92:b6:96.
-Are you sure you want to continue connecting (yes/no)? yes
+
 SSH password:
 localhost | SUCCESS => {
     "ansible_facts": {
@@ -740,11 +720,6 @@ localhost | SUCCESS => {
 }
 ```
 
-As you can see, Ansible set up an SSH connection that needed the host
-key to validate, as well as our SSH password. Now, although you could
-add the host key (as we did in the preceding code block), add key-based
-SSH authentication to your [localhost], and so on, there is a more
-direct way of doing this.
 
 We can now modify our inventory so that it looks as follows:
 
@@ -819,15 +794,7 @@ this command was run on the local machine without using SSH.
 Working with proxies and jump hosts
 ===================================
 
-Often, when it comes to configuring core network devices, these are
-isolated from the main network via a proxy or jump host. Ansible lends
-itself well to automating network device configuration as most of it is
-performed over SSH: however, this is only helpful in a scenario where
-Ansible can either be installed and operated from the jump host---or,
-better yet, can operate via a host such as this.
-
-Fortunately, Ansible can do exactly that. Let\'s assume that you have
-two Cumulus Networks switches in your network (these are based on a
+Let\'s assume that you have two Cumulus Networks switches in your network (these are based on a
 special distribution of Linux for switching hardware, which is very
 similar to Debian). These two switches have
 the [cmls01.example.com] and [cmls02.example.com] hostnames,
@@ -866,6 +833,7 @@ inventory, we can see whether it works:
 
 ```
 $ ansible -i switches -m ping all
+
 cmls02.example.com | SUCCESS => {
     "ansible_facts": {
         "discovered_interpreter_python": "/usr/bin/python"
@@ -939,8 +907,9 @@ from users during a playbook run with a practical example:
 
 ```
 $ ansible-playbook -i hosts prompt.yml
-Enter your username: james
-Enter your password:
+
+Enter your username: root
+Enter your password: fenago
 
 PLAY [A simple play to demonstrate prompting in a playbook] ********************
 
@@ -1051,23 +1020,13 @@ frt01.example.com : ok=2 changed=0 unreachable=0 failed=0 skipped=0 rescued=0 ig
 frt02.example.com : ok=2 changed=0 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0
 ```
 
-This play run is identical because, rather than including only the
-[install]-tagged tasks, we skipped the tasks tagged
-with [customize].
-
 
 Note that if you don\'t specify either [\--tags] or
-[\--skip-tags], then all the tasks are run, regardless of their
-tag.
+[\--skip-tags], then all the tasks are run, regardless of their tag.
 
 
-You can also specify more than one tag on the command line, running all
-the tasks that match any of the specified tags. Although the logic
-behind tags is relatively simple, it can take a little while to get used
-to it and the last thing you want to do is run your playbook on real
-hosts to check whether you understand tagging! A great way to figure
-this out is to add [\--list-tasks] to your command, which---rather
-than running the playbook---lists the tasks from the playbook that would
+Add [\--list-tasks] to your command, which --- rather
+than running the playbook --- lists the tasks from the playbook that would
 perform if you run it. Some examples are provided for you in the
 following code block, based on the example playbook we just created:
 
@@ -1116,6 +1075,9 @@ Let\'s proceed with a simple example that shows you how you can use Ansible Vaul
     call this file [secret.yml]. You can create this using the
     following command:
 
+**Note:** Use password : `fenago`. You can also choose any password.
+
+
 ```
 $ ansible-vault create secret.yml
 New Vault password:
@@ -1123,8 +1085,7 @@ Confirm New Vault password:
 ```
 
 Enter the password you have chosen for the vault when prompted and
-confirm it by entering it a second time (the vault that accompanies this
-course on GitHub is encrypted with the [secure] password).
+confirm it by entering it a second time.
 
 2.  When you have entered the password, you will be set to your normal
     editor (defined by the [EDITOR] shell variable). On my test
@@ -1144,13 +1105,13 @@ secretdata: "Ansible is cool!"
 
 ```
 $ cat secret.yml
+
 $ANSIBLE_VAULT;1.1;AES256
-63333734623764633865633237333166333634353334373862346334643631303163653931306138
-6334356465396463643936323163323132373836336461370a343236386266313331653964326334
-62363737663165336539633262366636383364343663396335643635623463626336643732613830
-6139363035373736370a646661396464386364653935636366633663623261633538626230616630
-35346465346430636463323838613037386636333334356265623964633763333532366561323266
-3664613662643263383464643734633632383138363663323730
+33343763613261613235616366303833386530383365633839303232653335313238656435326339
+3261313935663636666363333661333831623831633461300a303065306636343462653938306535
+64376366343364316264343133653834363832626633383738363263376539303036303331396365
+6564306631363730610a336430313536396137636266663737356538366565666536663231306164
+30366539313437316630386135613161303335333061623465326636663938653664
 ```
 
 4.  However, the great thing about Ansible Vault is that you can use
@@ -1184,6 +1145,7 @@ determines whether they are encrypted or not. 
 
 ```
 $ ansible-playbook -i hosts vaultplaybook.yml
+
 ERROR! Attempting to decrypt but no vault secrets found
 ```
 
@@ -1222,38 +1184,26 @@ the playbook, which we can see from the [debug] statement we
 created. Naturally, this defeats the purpose of using a vault, but it
 makes for a nice example.
 
-This is a very simple example of what you can do with vaults. There are
-multiple ways that you can specify passwords; you don\'t have to be
-prompted for them on the command line---they can be provided either by a
-plain text file that contains the vault password or via a script that
-could obtain the password from a secure location at run time (think of a
-dynamic inventory script, only for returning a password rather than a
-hostname). The [ansible-vault] tool itself can also be used to
-edit, view, and change the passwords in a vault file, or even decrypt it
-and turn it back into plain text. The user guide for Ansible Vault is a
-great place to start for more information
-(<https://docs.ansible.com/ansible/latest/user_guide/vault.html>).
 
 One thing to note is that you don\'t actually have to have a separate
 vault file for your sensitive data; you can actually include it inline
 in your playbook. For example, let\'s try re-encrypting our sensitive
-data for inclusion in an otherwise unencrypted playbook (again, use the
-[secure] password for the vault if you are testing the examples
-from the GitHub repository accompanying this course). Run the following
+data for inclusion in an otherwise unencrypted playbook. Run the following
 command in your shell (it should produce an output similar to what is
 shown):
 
 ```
 $ ansible-vault encrypt_string 'Ansible is cool!' --name secretdata
+
 New Vault password:
 Confirm New Vault password:
 secretdata: !vault |
           $ANSIBLE_VAULT;1.1;AES256
-          34393431303339353735656236656130336664666337363732376262343837663738393465623930
-          3366623061306364643966666565316235313136633264310a623736643362663035373861343435
-          62346264313638656363323835323833633264636561366339326332356430383734653030306637
-          3736336533656230380a316364313831666463643534633530393337346164356634613065396434
-          33316338336266636666353334643865363830346566666331303763643564323065
+          32666436303331396238613564626461613036633537616462363330636138646235356135613166
+          3732383332663266373962633962396331653632346334650a323136323937623765636566656130
+          34323562326235666165353032313062316664623533313163623230313963393436363461356333
+          3264623737383632350a366563383933303531666431333663356430323838653631353232363436
+          30346530393565333761323438393335653938666532613163376334386434303664
 Encryption successful
 ```
 
@@ -1309,12 +1259,6 @@ frt01.example.com : ok=2 changed=0 unreachable=0 failed=0 skipped=0 rescued=0 ig
 frt02.example.com : ok=2 changed=0 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0
 ```
 
-Ansible Vault is a powerful and versatile tool for encrypting your
-sensitive playbook data at rest and should enable you (with a little
-care) to run most of your playbooks unattended without ever leaving
-passwords or other sensitive data in the clear. That concludes this
-section and this lab; I hope that it has been useful for you.
-
 
 Summary
 =======
@@ -1325,8 +1269,9 @@ Ansible, before looking at the various features available for running
 playbooks to upgrade a cluster, such as running tasks on small batches
 of inventory hosts, failing a play early if a certain percentage of
 hosts fail, delegating tasks to a specific host, and even running tasks
-once, regardless of your inventory (or batch) size. You also learned
-about the difference between running playbooks locally as opposed to on
+once, regardless of your inventory (or batch) size. 
+
+You also learned about the difference between running playbooks locally as opposed to on
 [localhost] and how to use SSH-proxying to automate tasks on an
 isolated network via a [bastion] host. Finally, you learned about
 handling sensitive data without storing it unencrypted at rest, either

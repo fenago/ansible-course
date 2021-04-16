@@ -1,6 +1,6 @@
 ---
 - name: Second task delegation example
-  hosts: frontends
+  hosts: localhost
 
   tasks:
   - name: Perform an rsync from localhost to inventory hosts

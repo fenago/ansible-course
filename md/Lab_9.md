@@ -28,7 +28,6 @@ All lab file are present at below path. Run following command in the terminal fi
 `cd ~/Desktop/ansible-course/Lab_9` 
 
 
-
 Digging into playbook execution problems
 ========================================
 
@@ -51,8 +50,7 @@ blocking there, you can write something like the following:
   ignore_errors: yes
 ```
 
-As we have seen, [/bin/false] will always return [1] as
-return code, but we still managed to go forward in the execution.
+As we have seen, [/bin/false] will always return [1] as return code, but we still managed to go forward in the execution.
 
 
 
@@ -78,6 +76,12 @@ called [print\_facts.yaml], which contains the following content:
         var: hostvars[inventory_hostname]
 ```
 
+Run playbook:
+
+```
+$ ansible-playbook print_facts.yaml
+```
+
 This technique will give you a lot of information about the state of the
 target machine during Ansible execution.
 
@@ -85,11 +89,6 @@ target machine during Ansible execution.
 Testing with a playbook
 =======================
 
-One of the most complex things in the IT field is not creating software
-and systems, but debugging them when they have problems. Ansible is not
-an exception. No matter how good you are at creating Ansible playbooks,
-sooner or later, you\'ll find yourself debugging a playbook that is not
-behaving as you thought it would.
 
 The simplest way of performing basic tests is to print out the values of
 variables during execution. Let\'s learn how to do this with Ansible, as
@@ -184,10 +183,6 @@ will need to run a slightly different command:
 $ ansible-playbook debug2.yaml -vv
 ```
 
-By putting two [-v] options in the command line, we will be
-running Ansible with [verbosity] of [2]. This will not only
-affect this specific module but all the modules (or Ansible itself) that
-are set to behave differently at different debug levels.
 
 
 
@@ -337,61 +332,34 @@ PLAY RECAP *********************************************************************
 host.example.com : ok=0 changed=0 unreachable=1 failed=0 skipped=0 rescued=0 ignored=0 
 ```
 
-In this case, the host did reply, but we don\'t have enough access to be
-able to SSH into it.
 
-SSH connections usually fail for one of two reasons:
-
--   The SSH client is unable to establish a connection with the SSH
-    server
--   The SSH server refuses the credentials provided by the SSH client
-
-Due to OpenSSH\'s very high stability and backward compatibility, when
-the first issue occurs, it\'s very probable that the IP address or the
-port is wrong, so the TCP connection isn\'t feasible. Very rarely, this
-kind of error occurs in SSH-specific problems. Usually, double-checking
-the IP and the hostname (if it\'s a DNS, check that it resolves to the
-right IP) solves the problem. To investigate this further, you can try
-performing an SSH connection from the same machine to check if there are
-problems. For instance, I would do this like so:
+To investigate this further, you can try performing an SSH connection from the same machine to check if there are problems. 
 
 ```
 $ ssh host.example.com -vvv
 ```
 
 
-The second problem might be a little bit more complex to debug since it
-can happen for multiple reasons. One of those is that you are trying to
-connect to the wrong host and you don\'t have the credentials for that
-machine. Another common case is that the username is wrong. To debug it,
+Another common case is that the username is wrong. To debug it,
 you can take the [user\@host] address that is shown in the error
 (in my case, [fale\@host.example.com]) and use the same command
 you used previously:
+
+
+<span style="color:red;">Note: Add line `127.0.0.1	host.example.com` in the **/etc/hosts** file before running next command.</span>
+
 
 ```
 $ ssh fale@host.example.com -vvv
 ```
 
-This should raise the same error that Ansible reported to you, but with
-much more details.
+This should raise the error but with much more details.
 
-Now that you have learned how to solve host connection issues, let\'s
-learn how to pass working variables via the CLI.
 
 
 Passing working variables via the CLI
 =====================================
 
-One thing that can help during debugging, and definitely helps for code
-reusability, is passing variables to playbooks via the command line.
-Every time your application -- either an Ansible playbook or any kind of
-application -- receives an input from a third party (a human, in this
-case), it should ensure that the value is reasonable. An example of this
-would be to check that the variable has been set and therefore is not an
-empty string. This is a security golden rule, but should also be applied
-when the user is trusted since the user might mistype the variable name.
-The application should identify this and protect the whole system by
-protecting itself. Follow these steps:
 
 1.  The first thing we want to have is a simple playbook that prints the
     content of a variable. Let\'s create a playbook
@@ -573,10 +541,7 @@ addition of the [\--flush-cache] option, as follows:
 ansible-playbook -i inventory helloworld.yaml --flush-cache
 ```
 
-Ansible uses Redis to save host variables, as well as execution
-variables. Sometimes, those variables might be left behind and influence
-the following executions. By using the [\--flush-cache] option, we
-can avoid this since it will ensure that Ansible flushes the Redis cache
+By using the [\--flush-cache] option, we can ensure that Ansible flushes the Redis cache
 during its execution.
 
 Now that you have learned how to flush the code cache, let\'s learn how to check for bad syntax.

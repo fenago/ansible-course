@@ -537,25 +537,19 @@ inventory:
 
 
 ```
-$ ansible-playbook -i localhost delegate2.yml
+$ ansible-playbook delegate2.yml
 
 PLAY [Second task delegation example] ******************************************
 
 TASK [Gathering Facts] *********************************************************
-ok: [frt02.example.com]
-ok: [frt01.example.com]
+ok: [localhost]
 
 TASK [Perform an rsync from localhost to inventory hosts] **********************
-changed: [frt02.example.com -> localhost]
-changed: [frt01.example.com -> localhost]
+changed: [localhost -> localhost]
 
 PLAY RECAP *********************************************************************
-frt01.example.com : ok=2 changed=1 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0
-frt02.example.com : ok=2 changed=1 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0
+localhost : ok=2 changed=1 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0
 ```
-
-
-<span style="color:red;">Since we have added all above hosts in `/etc/hosts` with `127.0.0.1` address so they are pointing to same machine, you might get *file has vanished* error which can be ignored. This error won't occur using multiple machines</span>
 
 
 Using the run\_once option

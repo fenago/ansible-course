@@ -27,11 +27,11 @@ All lab file are present at below path. Run following command in the terminal fi
 
 `cd ~/Desktop/ansible-course/Lab_1` 
 
-
-Installing Ansible on Linux and FreeBSD
----------------------------------------
+<span style="color:red;">Make sure that your lab environment's `/etc/hosts` file has all host entries present in `hosts.txt` file which is located at the root folder.</span>
 
 
+Installing Ansible on Linux
+---------------------------
 
 The following are some examples showing how you might install Ansible on Ubuntu:
 
